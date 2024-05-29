@@ -1,5 +1,4 @@
 # MovieActorRanking
-# Information Retrieval Evaluation
 
 ## documents
 
