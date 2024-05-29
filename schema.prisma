@@ -1,0 +1,42 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider             = "prisma-client-py"
+  interface            = "asyncio"
+  recursive_type_depth = 5
+}
+
+model Movie {
+  id     Int      @id @default(autoincrement())
+  title  String
+  roles  Role[]
+  script Script[]
+}
+
+model Actor {
+  id    Int    @id @default(autoincrement())
+  name  String
+  roles Role[]
+}
+
+model Role {
+  id      Int      @id
+  name    String
+  movie   Movie    @relation(fields: [movieId], references: [id])
+  movieId Int
+  actor   Actor    @relation(fields: [actorId], references: [id])
+  actorId Int
+  script  Script[]
+}
+
+model Script {
+  id      Int     @id
+  content String?
+  movie   Movie   @relation(fields: [movieId], references: [id])
+  movieId Int
+  role    Role    @relation(fields: [roleId], references: [id])
+  roleId  Int
+}
