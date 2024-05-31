@@ -5,14 +5,14 @@ import pandas as pd
 from tqdm import tqdm
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-from config import MOV_FILE_PATH, MOV_SCR_FILE_PATH, MOV_ROL_FILE_PATH
+from config import RAW_MOV_FILE_PATH, PRO_MOV_ROL_FILE_PATH
 
 
 def get_imdb_data():
     ia = Cinemagoer()
 
     # Read the CSV file
-    df = pd.read_csv(MOV_FILE_PATH)
+    df = pd.read_csv(RAW_MOV_FILE_PATH)
 
     # Get unique movie titles
     unique_titles = df["title"]  # .unique()
@@ -66,7 +66,7 @@ def get_imdb_data():
     characters_df = pd.DataFrame(characters_data)
 
     # Save the DataFrame to a CSV file
-    characters_df.to_csv(MOV_ROL_FILE_PATH, index=False)
+    characters_df.to_csv(PRO_MOV_ROL_FILE_PATH, index=False)
 
 
 if __name__ == "__main__":
