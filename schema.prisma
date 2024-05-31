@@ -10,16 +10,18 @@ generator client {
 }
 
 model Movie {
-  id     Int      @id @default(autoincrement())
-  title  String
-  roles  Role[]
-  script Script[]
+  id      Int      @id @default(autoincrement())
+  imdbId  Int?     @unique
+  title   String
+  roles   Role[]
+  scripts Script[]
 }
 
 model Actor {
-  id    Int    @id @default(autoincrement())
-  name  String
-  roles Role[]
+  id     Int    @id @default(autoincrement())
+  imdbId Int?   @unique
+  name   String
+  roles  Role[]
 }
 
 model Role {
@@ -29,7 +31,7 @@ model Role {
   movieId Int
   actor   Actor    @relation(fields: [actorId], references: [id])
   actorId Int
-  script  Script[]
+  scripts Script[]
 }
 
 model Script {
