@@ -5,7 +5,7 @@ import sys
 from tqdm import tqdm
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-from config import RAW_MOV_SCR_FILE_PATH, PRO_MOV_SCR_FILE_PATH
+from config import RAW_IMSDB_MOV_SCR_FILE_PATH, PRO_IMSDB_MOV_SCR_FILE_PATH
 
 
 def parse_script(script: str) -> list:
@@ -96,4 +96,4 @@ def process_scripts(input_csv_path, output_csv_path):
 
 # Run the script
 if __name__ == "__main__":
-    process_scripts(RAW_MOV_SCR_FILE_PATH, PRO_MOV_SCR_FILE_PATH)
+    process_scripts(RAW_IMSDB_MOV_SCR_FILE_PATH, PRO_IMSDB_MOV_SCR_FILE_PATH)
