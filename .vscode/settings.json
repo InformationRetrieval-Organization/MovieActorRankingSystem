@@ -1,4 +1,18 @@
 {
     "cSpell.enabled": false,
-    "python.pythonPath": ".venv/bin/python"
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true,
+        "editor.tabSize": 4
+    },
+    "[json]": {
+        "editor.tabSize": 4
+    },
+    "python.pythonPath": ".venv/bin/python",
+    "terminal.integrated.env.linux": {
+        "PYTHONPATH": "${workspaceFolder}/.venv/bin/python"
+    },
+    "terminal.integrated.env.windows": {
+        "PYTHONPATH": "${workspaceFolder}/.venv/bin/python"
+    }
 }
