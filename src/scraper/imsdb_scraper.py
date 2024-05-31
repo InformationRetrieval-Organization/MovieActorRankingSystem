@@ -94,9 +94,12 @@ def get_imsdb_movies(file_path: str) -> None:
     for movie in tqdm(soup.find_all("p")):
         link = movie.find("a")
         if link:
+            title = link.get("title").split(" Script")[
+                0
+            ]  # Remove " Script" from the title
             movies.append(
                 {
-                    "title": link.get("title"),
+                    "title": title,
                     "link": IMSDB_URL + link.get("href").replace(" ", "%20"),
                 }
             )
@@ -117,6 +120,7 @@ def fetch_script_link(movie):
     soup = BeautifulSoup(html, "html.parser")
     links_in_page = soup.find_all("a")
     found = False
+
     for link in links_in_page:
         text = link.get_text()
         if "Read" in text and "Script" in text:
@@ -127,6 +131,7 @@ def fetch_script_link(movie):
     if not found:
         print("Script link not found for", title)
         movie["script_link"] = None
+
     return movie
 
 
