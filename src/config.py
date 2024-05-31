@@ -22,9 +22,11 @@ RAW_IMSDB_MOV_SCR_FILE_PATH = os.path.join(
 )
 
 # Processed Files
-PRO_MOV_ROL_FILE_PATH = os.path.join(CWD, "data", "processed", "movie_roles.csv")
-PRO_MOV_SCR_FILE_PATH = os.path.join(
-    CWD, "data", "processed", "movie_scripts_roles.csv"
+PRO_IMDB_MOV_ROL_FILE_PATH = os.path.join(
+    CWD, "data", "processed", "imdb_movie_roles.csv"
+)
+PRO_IMSDB_MOV_SCR_FILE_PATH = os.path.join(
+    CWD, "data", "processed", "imsdb_movie_scripts_roles.csv"
 )
 
 # Flask Environment
