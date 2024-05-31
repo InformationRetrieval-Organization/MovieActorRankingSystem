@@ -1,6 +1,4 @@
-from datetime import datetime, time
 import os
-import sys
 
 # Load environment variables
 from dotenv import load_dotenv
@@ -16,9 +14,16 @@ IMSDB_URL = "https://www.imsdb.com"
 
 # File Paths
 CWD = os.getcwd()
-MOV_FILE_PATH = os.path.join(CWD, "files", "movie_details_no_scripted.csv")
-MOV_SCR_FILE_PATH = os.path.join(CWD, "files", "movie_scripts.csv")
-MOV_ROL_FILE_PATH = os.path.join(CWD, "files", "movie_roles.csv")
+
+# Raw Files
+RAW_MOV_FILE_PATH = os.path.join(CWD, "data", "raw", "movie_details_no_scripted.csv")
+RAW_MOV_SCR_FILE_PATH = os.path.join(CWD, "data", "raw", "movie_scripts.csv")
+
+# Processed Files
+PRO_MOV_ROL_FILE_PATH = os.path.join(CWD, "data", "processed", "movie_roles.csv")
+PRO_MOV_SCR_FILE_PATH = os.path.join(
+    CWD, "data", "processed", "movie_scripts_roles.csv"
+)
 
 # Flask Environment
 FASTAPI_ENV = os.getenv("FASTAPI_ENV")
