@@ -35,10 +35,10 @@ model Role {
 }
 
 model Script {
-  id      Int     @id
-  content String?
-  movie   Movie   @relation(fields: [movieId], references: [id])
-  movieId Int
-  role    Role    @relation(fields: [roleId], references: [id])
-  roleId  Int
+  id       Int     @id
+  dialogue String?
+  movie    Movie   @relation(fields: [movieId], references: [id])
+  movieId  Int
+  role     Role    @relation(fields: [roleId], references: [id])
+  roleId   Int
 }
