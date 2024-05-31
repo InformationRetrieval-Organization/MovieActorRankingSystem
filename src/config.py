@@ -16,7 +16,7 @@ IMSDB_URL = "https://www.imsdb.com"
 CWD = os.getcwd()
 
 # Raw Files
-RAW_MOV_FILE_PATH = os.path.join(CWD, "data", "raw", "movie_details_no_scripted.csv")
+RAW_IMSDB_MOV_FILE_PATH = os.path.join(CWD, "data", "raw", "imsdb_movies.csv")
 RAW_MOV_SCR_FILE_PATH = os.path.join(CWD, "data", "raw", "movie_scripts.csv")
 
 # Processed Files
