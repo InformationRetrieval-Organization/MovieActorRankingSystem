@@ -42,10 +42,11 @@ Open `http://localhost:5050/`
 Click with the right mouse button on Servers and select Register -> Server.
 
 Connection tab requires to type:
-1) Host name/address: db
-2) Port: 5432
-3) Username: postgres
-4) Password: postgres
+1) Host name/address: host.docker.internal
+2) Port: 5433
+3) Database: movieactorrankingdb
+4) Username: postgres
+5) Password: postgres
 
 ## optional: swagger
 Open `http://localhost:8000/docs` to see the swagger UI

@@ -1,0 +1,9 @@
+.git*
+**/*.pyc
+.vscode/
+.venv/
+Dockerfile
+.dockerignore
+README.md
+docker.compose.yml
+.env.sample
