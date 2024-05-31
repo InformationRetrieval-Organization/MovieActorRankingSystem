@@ -8,6 +8,42 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 from config import RAW_IMSDB_MOV_SCR_FILE_PATH, PRO_IMSDB_MOV_SCR_FILE_PATH
 
 
+def is_scene_changer(line):
+    """Check if a line is a scene changer."""
+    sc_list = [
+        "EXT.",
+        "INT.",
+        "EXT ",
+        "INT ",
+        "INT:",
+        "EXT:",
+        "DECK ",
+        "ROOM",
+        "ELEVATOR",
+        "ON THE ",
+        "SLAM TO",
+        "INT/EXT",
+        "I/E.",
+        "TITLE",
+        "TRANSITION TO",
+        "LATER",
+        "NIGHT",
+        "THAT",
+        "APARTMENT",
+        "CUT TO",
+        "INTERCUT",
+        "SCENE",
+        "SFX OVER",
+        "VFX:",
+        "DISSOLVE ",
+    ]
+    for sc in sc_list:
+        if sc in line:
+            return True
+
+    return False
+
+
 def parse_script(script: str) -> list:
     # Split data by line breaks
     script_lines = script.splitlines()
@@ -55,9 +91,7 @@ def parse_script(script: str) -> list:
 
     # remove stage instructions; starting with "EXT." or "INT."
     parsed_data = [
-        (role, dialogue)
-        for role, dialogue in parsed_data
-        if not role.startswith(("EXT.", "INT.", "VFX:"))
+        (role, dialogue) for role, dialogue in parsed_data if not is_scene_changer(role)
     ]
 
     return parsed_data
@@ -74,7 +108,8 @@ def process_scripts(input_csv_path, output_csv_path):
     processed_data = []
 
     # Iterate over each row in the DataFrame
-    for index, row in tqdm(df.iterrows(), desc="Processing Scripts"):
+    for index, row in tqdm(df.iterrows(), total=df.shape[0], desc="Processing Scripts"):
+        # your code here
         title = row["title"]
         script = row["script"]
 
@@ -84,7 +119,7 @@ def process_scripts(input_csv_path, output_csv_path):
         # Add the parsed data to the processed data list
         for role, dialogue in parsed_script:
             processed_data.append(
-                {"dialogueText": dialogue, "movie": title, "role": role}
+                {"movie": title, "role": role, "dialogueText": dialogue}
             )
 
     # Create a new DataFrame from the processed data
