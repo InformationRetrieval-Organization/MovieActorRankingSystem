@@ -13,3 +13,5 @@ matplotlib
 slowapi
 aiocache
 python-dotenv
+cinemagoer
+tqdm
