@@ -17,7 +17,9 @@ CWD = os.getcwd()
 
 # Raw Files
 RAW_IMSDB_MOV_FILE_PATH = os.path.join(CWD, "data", "raw", "imsdb_movies.csv")
-RAW_MOV_SCR_FILE_PATH = os.path.join(CWD, "data", "raw", "movie_scripts.csv")
+RAW_IMSDB_MOV_SCR_FILE_PATH = os.path.join(
+    CWD, "data", "raw", "imsdb_movie_scripts.csv"
+)
 
 # Processed Files
 PRO_MOV_ROL_FILE_PATH = os.path.join(CWD, "data", "processed", "movie_roles.csv")
