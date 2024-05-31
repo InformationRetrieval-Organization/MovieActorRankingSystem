@@ -29,9 +29,9 @@ def fetch_movie_data(movie_name, ia):
                     characters_data.append(
                         {
                             "title": movie["title"],
-                            "imdb_id": movie_id,
+                            "imdb_movie_id": movie_id,
                             "actor": person["name"],
-                            "actor_id": person.personID,
+                            "imdb_actor_id": person.personID,
                             "role": character["name"],
                         }
                     )
