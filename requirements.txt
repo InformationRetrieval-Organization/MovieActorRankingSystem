@@ -1,0 +1,15 @@
+prisma
+fastapi
+uvicorn
+gunicorn
+scikit-learn
+nltk
+bs4
+selenium
+pandas
+marshmallow
+numpy
+matplotlib
+slowapi
+aiocache
+python-dotenv
