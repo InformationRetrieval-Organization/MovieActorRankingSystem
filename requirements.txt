@@ -15,3 +15,5 @@ aiocache
 python-dotenv
 cinemagoer
 tqdm
+fuzzywuzzy
+python-Levenshtein

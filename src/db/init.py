@@ -8,7 +8,10 @@ from db.actor import create_many_actors, delete_all_actors
 from db.movie import create_many_movies, delete_all_movies
 from db.role import create_many_roles, delete_all_roles
 from db.script import create_many_scripts, delete_all_scripts
-from config import PRO_IMDB_MOV_ROL_FILE_PATH, PRO_IMSDB_MOV_SCR_FILE_PATH
+from config import (
+    PRO_IMDB_MOV_ROL_FILE_PATH,
+    PRO_IMDB_IMSDB_MOV_SCR_FILE_PATH,
+)
 
 
 async def init_database():
@@ -23,10 +26,8 @@ async def init_database():
 
     await insert_actors()
     await insert_movies()
-
-    df = await merge_movie_roles()
-    await insert_roles(df)
-    await insert_scripts(df)
+    await insert_roles()
+    await insert_scripts()
 
 
 async def insert_actors():
@@ -55,23 +56,12 @@ async def insert_movies():
     await create_many_movies(movies)
 
 
-async def merge_movie_roles():
-    """
-    Merge the movie and role dataframes
-    """
-    imdb_movies = pd.read_csv(PRO_IMDB_MOV_ROL_FILE_PATH)
-    imsdb_movie_dialogues = pd.read_csv(PRO_IMSDB_MOV_SCR_FILE_PATH)
-
-    # Merge the two dataframes on the movie title
-    df = pd.merge(imdb_movies, imsdb_movie_dialogues, on="title")
-
-    return df
-
-
 async def insert_roles(df: pd.DataFrame):
     """
     Insert all roles into the database
     """
+    df = pd.read_csv(PRO_IMDB_IMSDB_MOV_SCR_FILE_PATH)
+
     roles = df[["role", "imdb_role_id"]].drop_duplicates()
     roles.columns = ["name", "imdbId"]  # Rename columns
     roles = roles.to_dict("records")
@@ -83,6 +73,8 @@ async def insert_scripts(df: pd.DataFrame):
     """
     Insert all scripts into the database
     """
+    df = pd.read_csv(PRO_IMDB_IMSDB_MOV_SCR_FILE_PATH)
+
     scripts = df[["dialogueText", "imdb_role_id", "imdb_movie_id"]].drop_duplicates()
     scripts.columns = ["dialogue", "roleId", "movieId"]  # Rename columns
     scripts = scripts.to_dict("records")

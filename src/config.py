@@ -28,6 +28,9 @@ PRO_IMDB_MOV_ROL_FILE_PATH = os.path.join(
 PRO_IMSDB_MOV_SCR_FILE_PATH = os.path.join(
     CWD, "data", "processed", "imsdb_movie_scripts_roles.csv"
 )
+PRO_IMDB_IMSDB_MOV_SCR_FILE_PATH = os.path.join(
+    CWD, "data", "processed", "imdb_imsdb_movie_scripts.csv"
+)
 
 # Flask Environment
 FASTAPI_ENV = os.getenv("FASTAPI_ENV")
