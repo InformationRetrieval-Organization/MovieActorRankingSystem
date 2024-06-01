@@ -37,10 +37,8 @@ def process_dialogue_row(dialogue_row, imdb_movies):
                 highest_score = score
                 best_match = movie_row
 
-        # If a match is found with a score above a threshold, return the merged data
-        if (
-            best_match is not None and highest_score >= 30
-        ):  # Adjust the threshold as needed
+        # If a match is found with a score above a threshold (30 %), return the merged data
+        if best_match is not None and highest_score >= 30:
             return {
                 "title": movie_title,
                 "imdb_id": best_match["imdb_movie_id"],
