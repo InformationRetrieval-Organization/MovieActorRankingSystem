@@ -1,4 +1,4 @@
-from imdb import Cinemagoer
+from imdb import IMDb
 import os
 import sys
 import pandas as pd
@@ -9,50 +9,67 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 from config import RAW_IMSDB_MOV_FILE_PATH, PRO_IMDB_MOV_ROL_FILE_PATH
 
 
-def fetch_movie_data(movie_name, ia):
-    """Fetches movie data from IMDb for a given movie title."""
-    movies = ia.search_movie(movie_name)
+def fetch_movie_data(movie_name: str, imdb: IMDb):
+    """
+    Fetches movie data from IMDb for a given movie title.
+    """
+    movies = imdb.search_movie(movie_name)
     characters_data = []
 
     if movies:
         movie = movies[0]
-        ia.update(movie)
-        movie_id = movie.movieID
+        imdb.update(movie)  # Fetches the cast data, for characters
 
         for person in movie.get("cast", []):
             characters = person.currentRole
+
             if not isinstance(characters, list):
                 characters = [characters]
 
             for character in characters:
-                if "name" in character:
-                    characters_data.append(
-                        {
-                            "title": movie["title"],
-                            "imdb_movie_id": movie_id,
-                            "actor": person["name"],
-                            "imdb_actor_id": person.personID,
-                            "role": character["name"],
-                        }
-                    )
-                else:
+                if "name" not in character:
                     print(
-                        f"Warning: Actor '{person['name']}' without a role name found in movie '{movie['title']}'"
+                        f"Warning: Actor '{person['name']}' without a role in movie '{movie['title']}'"
                     )
+                    continue
+
+                characters_data.append(
+                    {
+                        "imdb_movie_title": movie["title"],
+                        "imdb_movie_id": movie.movieID,
+                        "imdb_movie_cover_url": movie.get("cover url"),  # can be None
+                        "imdb_actor_name": person["name"],
+                        "imdb_actor_id": person.personID,
+                        "role": character["name"],
+                    }
+                )
+
     return characters_data
 
 
+def fetch_actor_headshot(imdb_actor_id, imdb: IMDb):
+    """
+    Fetches actor headshot from IMDb for a given character.
+    """
+    person = imdb.get_person(imdb_actor_id)
+    imdb.update(person)  # Fetches the full person data, for headshot
+
+    return imdb_actor_id, person.get("headshot")
+
+
 def get_imdb_data(input_file_path: str, output_file_path: str):
-    """Fetches IMDb data for movies listed in a CSV file and saves the character data to another CSV file."""
-    ia = Cinemagoer()
+    """
+    Fetches IMDb data for movies listed in a CSV file and saves the character data to another CSV file.
+    """
+    imdb = IMDb()
     df = pd.read_csv(input_file_path)
     unique_titles = df["title"]
 
     characters_data = []
 
-    with ThreadPoolExecutor(max_workers=10) as executor:
+    with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
         futures = {
-            executor.submit(fetch_movie_data, movie_name, ia): movie_name
+            executor.submit(fetch_movie_data, movie_name, imdb): movie_name
             for movie_name in unique_titles
         }
         for future in tqdm(
@@ -66,6 +83,33 @@ def get_imdb_data(input_file_path: str, output_file_path: str):
                 print(f"Error processing {movie_name}: {exc}")
 
     characters_df = pd.DataFrame(characters_data)
+    characters_df.to_csv(
+        output_file_path, index=False
+    )  # already saved the data to a file
+
+    unique_actors = characters_df["imdb_actor_id"].unique()
+    actor_headshots = {}
+
+    with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
+        futures = {
+            executor.submit(fetch_actor_headshot, actor_id, imdb): actor_id
+            for actor_id in unique_actors
+        }
+        for future in tqdm(
+            as_completed(futures),
+            total=len(futures),
+            desc="Processing Actors Headshots",
+        ):
+            try:
+                actor_id, headshot = future.result()
+                actor_headshots[actor_id] = headshot
+            except Exception as exc:
+                actor_id = futures[future]
+                print(f"Error processing {actor_id}: {exc}")
+
+    characters_df["imdb_actor_headshot"] = characters_df["imdb_actor_id"].map(
+        actor_headshots
+    )
     characters_df.to_csv(output_file_path, index=False)
 
 
