@@ -41,11 +41,11 @@ def process_dialogue_row(dialogue_row, imdb_movies):
         if best_match is not None and highest_score >= 30:
             return {
                 "title": movie_title,
-                "imdb_id": best_match["imdb_movie_id"],
-                "dialogueText": dialogue_text,
+                "imdb_movie_id": best_match["imdb_movie_id"],
                 "actor": best_match["actor"],
-                "actor_id": best_match["imdb_actor_id"],
+                "imdb_actor_id": best_match["imdb_actor_id"],
                 "role": best_match["role"],
+                "dialogueText": dialogue_text,
             }
     return None
 
@@ -83,6 +83,13 @@ def merge_movie_data(
 
     # Convert the merged data to a DataFrame
     merged_df = pd.DataFrame(merged_data)
+
+    # sort the merged DataFrame by title, actor, and role
+    merged_df = merged_df.sort_values(by=["title", "actor", "role"]).reset_index(
+        drop=True
+    )
+
+    df = df.dropna(subset=["dialogueText"])
 
     # Save the merged DataFrame to a CSV file
     merged_df.to_csv(output_file_path, index=False)
