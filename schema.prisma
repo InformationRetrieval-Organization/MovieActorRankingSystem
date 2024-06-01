@@ -25,7 +25,7 @@ model Actor {
 }
 
 model Role {
-  id      Int      @id
+  id      Int      @id @default(autoincrement())
   name    String
   movie   Movie    @relation(fields: [movieId], references: [id])
   movieId Int
@@ -35,7 +35,7 @@ model Role {
 }
 
 model Script {
-  id       Int     @id
+  id       Int     @id @default(autoincrement())
   dialogue String?
   movie    Movie   @relation(fields: [movieId], references: [id])
   movieId  Int
