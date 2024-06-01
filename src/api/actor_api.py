@@ -1,12 +1,12 @@
 from fastapi import APIRouter
 from prisma import models
 from typing import List
-from db.actor import get_all_actors
+from db.actor import search_actor as search_actor_db
 
 router = APIRouter()
 
 
-@router.post(
+@router.get(
     "/search/actor",
     responses={
         429: {"description": "Too Many Requests"},
@@ -14,13 +14,13 @@ router = APIRouter()
 )
 async def search_actor(q: str) -> List[models.Actor]:
     """
-    Search the Boolean Model for the given query.<br>
-    Example usage: http://127.0.0.1:8000/search/boolean
+    Search for actors by name.<br>
+    Example usage: http://127.0.0.1:8000/search/actor
     """
     query = q
     print(f"Query: {query}")
 
     # TODO: Implement search functionality
-    actors = await get_all_actors()
+    actors = await search_actor_db(query)
 
     return actors
