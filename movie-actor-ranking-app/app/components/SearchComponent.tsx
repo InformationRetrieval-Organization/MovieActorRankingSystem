@@ -14,11 +14,9 @@ const SearchComponent = () => {
         setIsLoading(true);
 
         try {
-            let url = '';
             let data: ActorResult[] = [];
 
-            url = `/search/actor?q=${inputValue.replace(/\s/g, '+')}`;
-            data = await getActors(url);
+            data = await getActors(inputValue);
 
             setResults(data);
         } catch (error) {
