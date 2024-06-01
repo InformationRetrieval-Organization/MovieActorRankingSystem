@@ -10,18 +10,20 @@ generator client {
 }
 
 model Movie {
-  id      Int      @id @default(autoincrement())
-  imdbId  Int?     @unique
-  title   String
-  roles   Role[]
-  scripts Script[]
+  id       Int      @id @default(autoincrement())
+  imdbId   Int?     @unique
+  title    String
+  coverUrl String?
+  roles    Role[]
+  scripts  Script[]
 }
 
 model Actor {
-  id     Int    @id @default(autoincrement())
-  imdbId Int?   @unique
-  name   String
-  roles  Role[]
+  id          Int     @id @default(autoincrement())
+  imdbId      Int?    @unique
+  name        String
+  headshotUrl String?
+  roles       Role[]
 }
 
 model Role {
