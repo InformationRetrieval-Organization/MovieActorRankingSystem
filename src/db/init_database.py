@@ -8,6 +8,7 @@ from db.actor import create_many_actors, delete_all_actors, search_actor, search
 from db.movie import create_many_movies, delete_all_movies, search_movie, search_movies
 from db.role import create_many_roles, delete_all_roles, search_roles
 from db.script import create_many_scripts, delete_all_scripts
+from db.reset_database import reset_database
 from config import (
     PRO_IMDB_MOV_ROL_FILE_PATH,
     PRO_IMDB_IMSDB_MOV_SCR_FILE_PATH,
@@ -18,10 +19,7 @@ async def init_database():
     """
     Initialize the database by deleting the existing posts and processed_posts and inserting the articles from the files into the database
     """
-    await delete_all_scripts()
-    await delete_all_roles()
-    await delete_all_actors()
-    await delete_all_movies()
+    await reset_database()
 
     await insert_actors()
     await insert_movies()
