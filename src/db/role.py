@@ -54,7 +54,7 @@ async def delete_all_roles() -> None:
         async with Prisma() as db:
             # await db.role.delete_many()
             # await db.execute_raw('TRUNCATE TABLE "Role" RESTART IDENTITY')
-            await db.execute_raw('TRUNCATE TABLE "Role" CASCADE')
+            await db.execute_raw('TRUNCATE TABLE "Role" RESTART IDENTITY CASCADE')
     except Exception as e:
         print(f"An error occurred while deleting roles: {e}")
 

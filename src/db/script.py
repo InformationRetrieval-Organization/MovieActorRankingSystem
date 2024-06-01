@@ -56,6 +56,6 @@ async def delete_all_scripts() -> None:
         async with Prisma() as db:
             # await db.script.delete_many()
             # await db.execute_raw('TRUNCATE TABLE "Script" RESTART IDENTITY')
-            await db.execute_raw('TRUNCATE TABLE "Script" CASCADE')
+            await db.execute_raw('TRUNCATE TABLE "Script" RESTART IDENTITY CASCADE')
     except Exception as e:
         print(f"An error occurred while deleting scripts: {e}")

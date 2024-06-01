@@ -53,7 +53,7 @@ async def delete_all_movies() -> None:
         async with Prisma() as db:
             # await db.movie.delete_many()
             # await db.execute_raw('TRUNCATE TABLE "Movie" RESTART IDENTITY')
-            await db.execute_raw('TRUNCATE TABLE "Movie" CASCADE')
+            await db.execute_raw('TRUNCATE TABLE "Movie" RESTART IDENTITY CASCADE')
     except Exception as e:
         print(f"An error occurred while deleting movies: {e}")
 

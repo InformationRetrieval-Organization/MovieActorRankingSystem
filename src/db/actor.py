@@ -53,7 +53,7 @@ async def delete_all_actors() -> None:
         async with Prisma() as db:
             # await db.actor.delete_many()
             # await db.execute_raw('TRUNCATE TABLE "Actor" RESTART IDENTITY')
-            await db.execute_raw('TRUNCATE TABLE "Actor" CASCADE')
+            await db.execute_raw('TRUNCATE TABLE "Actor" RESTART IDENTITY CASCADE')
     except Exception as e:
         print(f"An error occurred while deleting actors: {e}")
 
