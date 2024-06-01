@@ -15,9 +15,7 @@ async def get_all_scripts() -> List[models.Script]:
         return []
 
 
-async def create_many_scripts(
-    scripts: List[Dict[str, Union[str, int]]]
-) -> List[models.Script]:
+async def create_many_scripts(scripts: List[Dict[str, Union[str, int]]]) -> int:
     """
     Create multiple scripts in the database
     """
@@ -56,7 +54,8 @@ async def delete_all_scripts() -> None:
     print("Deleting all scripts")
     try:
         async with Prisma() as db:
-            await db.script.delete_many()
-            await db.execute_raw('TRUNCATE TABLE "Script" RESTART IDENTITY')
+            # await db.script.delete_many()
+            # await db.execute_raw('TRUNCATE TABLE "Script" RESTART IDENTITY')
+            await db.execute_raw('TRUNCATE TABLE "Script" CASCADE')
     except Exception as e:
         print(f"An error occurred while deleting scripts: {e}")

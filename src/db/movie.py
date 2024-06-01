@@ -15,9 +15,7 @@ async def get_all_movies() -> List[models.Movie]:
         return []
 
 
-async def create_many_movies(
-    movies: List[Dict[str, Union[str, int]]]
-) -> List[models.Movie]:
+async def create_many_movies(movies: List[Dict[str, Union[str, int]]]) -> int:
     """
     Create multiple movies in the database
     """
@@ -53,7 +51,33 @@ async def delete_all_movies() -> None:
     print("Deleting all movies")
     try:
         async with Prisma() as db:
-            await db.movie.delete_many()
-            await db.execute_raw('TRUNCATE TABLE "Movie" RESTART IDENTITY')
+            # await db.movie.delete_many()
+            # await db.execute_raw('TRUNCATE TABLE "Movie" RESTART IDENTITY')
+            await db.execute_raw('TRUNCATE TABLE "Movie" CASCADE')
     except Exception as e:
         print(f"An error occurred while deleting movies: {e}")
+
+
+async def search_movie(title: str) -> List[models.Movie]:
+    """
+    Search for a movie by title
+    """
+    try:
+        async with Prisma() as db:
+            return await db.movie.find_many(where={"title": {"contains": title}})
+    except Exception as e:
+        print(f"An error occurred while searching for the movie: {e}")
+        return []
+
+
+async def search_movies(titles: List[str]) -> Dict[str, int]:
+    """
+    Search for movies by titles
+    """
+    try:
+        async with Prisma() as db:
+            movies = await db.movie.find_many(where={"title": {"in": titles}})
+            return {movie.title: movie.id for movie in movies}
+    except Exception as e:
+        print(f"An error occurred while searching for the movies: {e}")
+        return {}
