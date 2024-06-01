@@ -3,7 +3,7 @@ const baseUrl = process.env.MAR_API_URL;
 
 export async function getActors(query: string): Promise<ActorResult[]> {  
     try {
-        console.log(`${baseUrl}/search/actor?q=${encodeURIComponent(query)}`);
+        console.log(`fetch request with: ${baseUrl}/search/actor?q=${encodeURIComponent(query)}`);
         const response = await fetch(`${baseUrl}/search/actor?q=${encodeURIComponent(query)}`);
 
         const data = await response.json();
