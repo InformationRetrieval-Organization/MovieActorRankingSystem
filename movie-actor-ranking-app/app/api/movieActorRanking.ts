@@ -1,9 +1,10 @@
 "use server";
 const baseUrl = process.env.MAR_API_URL;
 
-export async function getActors(url: string): Promise<ActorResult[]> {  
+export async function getActors(query: string): Promise<ActorResult[]> {  
     try {
-        const response = await fetch(`${baseUrl}${url}`);
+        console.log(`${baseUrl}/search/actor?q=${encodeURIComponent(query)}`);
+        const response = await fetch(`${baseUrl}/search/actor?q=${encodeURIComponent(query)}`);
 
         const data = await response.json();
         const actors: ActorResult[] = data as ActorResult[];
