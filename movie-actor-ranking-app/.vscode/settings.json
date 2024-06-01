@@ -1,0 +1,17 @@
+{
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "cSpell.enabled": false,
+  "appService.zipIgnorePattern": [
+    "node_modules{,/**}",
+    ".vscode{,/**}"
+  ],
+  "appService.deploySubpath": ".",
+  "[json]": {
+    "editor.tabSize": 4,
+    "editor.formatOnSave": true
+  },
+  "[typescriptreact]": {
+    "editor.tabSize": 4,
+    "editor.formatOnSave": true
+  }
+}
