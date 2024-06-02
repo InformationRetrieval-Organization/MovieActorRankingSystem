@@ -107,7 +107,7 @@ def get_imdb_data(input_file_path: str, output_file_path: str):
                 actor_id = futures[future]
                 print(f"Error processing {actor_id}: {exc}")
 
-    characters_df["imdb_actor_headshot"] = characters_df["imdb_actor_id"].map(
+    characters_df["imdb_actor_headshot_url"] = characters_df["imdb_actor_id"].map(
         actor_headshots
     )
     characters_df.to_csv(output_file_path, index=False)
