@@ -31,10 +31,19 @@ async def insert_actors():
     """
     Insert all actors into the database
     """
+    # columns: imdb_movie_title,imdb_movie_id,imdb_movie_cover_url,imdb_actor_name,imdb_actor_id,role,imdb_actor_headshot_url
     df = pd.read_csv(PRO_IMDB_MOV_ROL_FILE_PATH)
 
-    actors = df[["actor", "imdb_actor_id"]].drop_duplicates()
-    actors.columns = ["name", "imdbId"]  # Rename columns
+    actors = df[
+        ["imdb_actor_name", "imdb_actor_id", "imdb_actor_headshot_url"]
+    ].drop_duplicates()
+    actors.columns = ["name", "imdbId", "headshotUrl"]  # Rename columns
+
+    # Ensure headshotUrl is either a string or None
+    actors["headshotUrl"] = actors["headshotUrl"].apply(
+        lambda x: x if isinstance(x, str) else None
+    )
+
     actors = actors.to_dict("records")
 
     res = await create_many_actors(actors)
@@ -46,10 +55,19 @@ async def insert_movies():
     """
     Insert all movies into the database
     """
+    # columns: imdb_movie_title,imdb_movie_id,imdb_movie_cover_url,imdb_actor_name,imdb_actor_id,role,imdb_actor_headshot_url
     df = pd.read_csv(PRO_IMDB_MOV_ROL_FILE_PATH)
 
-    movies = df[["title", "imdb_movie_id"]].drop_duplicates()
-    movies.columns = ["title", "imdbId"]  # Rename columns
+    movies = df[
+        ["imdb_movie_title", "imdb_movie_id", "imdb_movie_cover_url"]
+    ].drop_duplicates()
+    movies.columns = ["title", "imdbId", "coverUrl"]  # Rename columns
+
+    # Ensure coverUrl is either a string or None
+    movies["coverUrl"] = movies["coverUrl"].apply(
+        lambda x: x if isinstance(x, str) else None
+    )
+
     movies = movies.to_dict("records")
 
     res = await create_many_movies(movies)
@@ -57,37 +75,29 @@ async def insert_movies():
     print(f"Inserted {res} movies")
 
 
-async def apply_async_movies(df):
-    titles = df["title"].tolist()
-    title_to_id = await search_movies(titles)
-    return [title_to_id[title] for title in titles]
-
-
-async def apply_async_actors(df):
-    names = df["actor"].tolist()
-    name_to_id = await search_actors(names)
-    return [name_to_id[name] for name in names]
-
-
-async def apply_async_roles(df):
-    titles = df["role"].tolist()
-    title_to_id = await search_roles(titles)
-    return [title_to_id[title] for title in titles]
-
-
 async def insert_roles():
     """
     Insert all roles into the database
     """
+    # columns: imdb_movie_title,imdb_movie_id,imdb_movie_cover_url,imdb_actor_name,imdb_actor_id,role,imdb_actor_headshot_url
     df = pd.read_csv(PRO_IMDB_MOV_ROL_FILE_PATH)
 
     roles = df[
-        ["title", "imdb_movie_id", "actor", "imdb_actor_id", "role"]
+        [
+            "imdb_movie_title",
+            "imdb_movie_id",
+            "imdb_actor_name",
+            "imdb_actor_id",
+            "role",
+        ]
     ].drop_duplicates()
 
     # add database movieId with search_movie function
-    roles["db_movie_id"] = await apply_async_movies(roles)
-    roles["db_actor_id"] = await apply_async_actors(roles)
+    movie_ids = await search_movies(list(roles["imdb_movie_title"].unique()))
+    roles["db_movie_id"] = roles["imdb_movie_title"].map(movie_ids)
+
+    actor_ids = await search_actors(list(roles["imdb_actor_name"].unique()))
+    roles["db_actor_id"] = roles["imdb_actor_name"].map(actor_ids)
 
     # select only the columns we need
     roles = roles[["role", "db_movie_id", "db_actor_id"]]
@@ -111,14 +121,26 @@ async def insert_scripts():
     scripts = df[["title", "dialogueText", "role"]].drop_duplicates()
 
     # add database movieId with search_movie function
-    scripts["db_movie_id"] = await apply_async_movies(scripts)
-    scripts["db_role_id"] = await apply_async_roles(scripts)
+    movie_ids = await search_movies(list(scripts["title"].unique()))
+    scripts["db_movie_id"] = scripts["title"].map(movie_ids)
 
-    # only select the columns we need: dialogueText, db_movie_id', db_role_id
-    scripts = scripts[["dialogueText", "db_movie_id", "db_role_id"]]
+    actor_ids = await search_roles(list(scripts["role"].unique()))
+    scripts["db_role_id"] = scripts["role"].map(actor_ids)
+
+    # drop rows with missing values
+    scripts = scripts.dropna()
+
+    # only select the columns we need: db_movie_id', db_role_id, dialogueText
+    scripts = scripts[
+        [
+            "db_movie_id",
+            "db_role_id",
+            "dialogueText",
+        ]
+    ]
 
     # Rename columns
-    scripts.columns = ["dialogue", "movieId", "roleId"]
+    scripts.columns = ["movieId", "roleId", "dialogue"]
 
     scripts = scripts.to_dict("records")
 
