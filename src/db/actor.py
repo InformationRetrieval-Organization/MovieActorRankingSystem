@@ -15,7 +15,7 @@ async def get_all_actors() -> List[models.Actor]:
         return []
 
 
-async def create_many_actors(actors: List[Dict[str, Union[str, int]]]) -> int:
+async def create_many_actors(actors: List[Dict[str, Union[str, int, str]]]) -> int:
     """
     Create multiple actors in the database
     """
@@ -27,7 +27,7 @@ async def create_many_actors(actors: List[Dict[str, Union[str, int]]]) -> int:
         print(f"An error occurred while creating the actors: {e}")
 
 
-async def create_one_actor(name: str, imdb_id: int) -> models.Actor:
+async def create_one_actor(name: str, imdb_id: int, headshot_url: str) -> models.Actor:
     """
     Create an actor in the database
     """
@@ -37,6 +37,7 @@ async def create_one_actor(name: str, imdb_id: int) -> models.Actor:
                 data={
                     "name": name,
                     "imdbId": imdb_id,
+                    "headshotUrl": headshot_url,
                 }
             )
             return actor

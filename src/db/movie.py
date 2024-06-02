@@ -27,7 +27,7 @@ async def create_many_movies(movies: List[Dict[str, Union[str, int]]]) -> int:
         print(f"An error occurred while creating the movies: {e}")
 
 
-async def create_one_movie(title: str, imdb_id: int) -> models.Movie:
+async def create_one_movie(title: str, imdb_id: int, cover_url: str) -> models.Movie:
     """
     Create a movie in the database
     """
@@ -37,6 +37,7 @@ async def create_one_movie(title: str, imdb_id: int) -> models.Movie:
                 data={
                     "title": title,
                     "imdbId": imdb_id,
+                    "coverUrl": cover_url,
                 }
             )
             return movie
