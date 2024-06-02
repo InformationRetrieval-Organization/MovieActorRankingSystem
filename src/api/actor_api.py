@@ -23,4 +23,6 @@ async def search_actor(q: str) -> List[models.Actor]:
     # TODO: Implement search functionality
     actors = await search_actor_db(query)
 
+    print(f"returning {len(actors)} actors")
+
     return actors
