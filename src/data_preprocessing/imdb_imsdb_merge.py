@@ -22,7 +22,7 @@ def process_dialogue_row(dialogue_row, imdb_movies):
     dialogue_text = dialogue_row["dialogueText"]
 
     # Filter the imdb_movies dataframe for the current movie title
-    movie_matches = imdb_movies[imdb_movies["title"] == movie_title]
+    movie_matches = imdb_movies[imdb_movies["imdb_movie_title"] == movie_title]
 
     if not movie_matches.empty:
         # Find the best match for the role using fuzzy string matching
@@ -42,7 +42,7 @@ def process_dialogue_row(dialogue_row, imdb_movies):
             return {
                 "title": movie_title,
                 "imdb_movie_id": best_match["imdb_movie_id"],
-                "actor": best_match["actor"],
+                "actor": best_match["imdb_actor_name"],
                 "imdb_actor_id": best_match["imdb_actor_id"],
                 "role": best_match["role"],
                 "dialogueText": dialogue_text,
@@ -98,6 +98,8 @@ def merge_movie_data(
 
 
 if __name__ == "__main__":
+    print("Merging IMDb and IMSDB data...")
+
     merged_df = merge_movie_data(
         PRO_IMDB_MOV_ROL_FILE_PATH,
         PRO_IMSDB_MOV_SCR_FILE_PATH,
