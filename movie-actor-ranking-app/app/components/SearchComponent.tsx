@@ -14,11 +14,13 @@ const SearchComponent = () => {
         setIsLoading(true);
 
         try {
-            let data: ActorResult[] = [];
+            let actors: ActorResult[] = [];
 
-            data = await getActors(inputValue);
+            actors = await getActors(inputValue);
 
-            setResults(data);
+            console.log("actors: ", actors);
+
+            setResults(actors);
         } catch (error) {
             console.error("Failed to fetch data:", error);
         } finally {

@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Card, CardHeader, CardBody, Link, Pagination } from "@nextui-org/react";
+import { Card, CardHeader, CardBody, Link, Pagination, Image } from "@nextui-org/react";
+
+// Utility function to format the IMDb ID
+const formatImdbId = (imdbId: number): string => {
+    return `nm${imdbId.toString().padStart(7, '0')}`;
+};
+
+const formatImdbActorUrl = (imdbId: number): string => {
+    return `https://www.imdb.com/name/${formatImdbId(imdbId)}`;
+}
 
 export default function ResultsList({ results }: { results: ActorResult[] }) {
     const [currentPage, setCurrentPage] = useState(1);
@@ -31,8 +40,26 @@ export default function ResultsList({ results }: { results: ActorResult[] }) {
         <div>
             {resultsForPage.map((result, index) => (
                 <Card key={index} className="mt-3">
-                    <CardBody className="px-3 py-0 text-small text-default-400 mb-2">
-                        <p>{result.name}</p>
+                    <CardBody>
+                        <div className="flex gap-6 items-center justify-center">
+                            <div className="">
+                                <Image
+                                    alt={result.headshotUrl ? `${result.name}'s profile` : "No profile picture available"}
+                                    height={100}
+                                    width={100}
+                                    className="object-cover"
+                                    shadow="md"
+                                    src={result.headshotUrl ? result.headshotUrl : "https://corporate.bestbuy.com/wp-content/uploads/2022/06/Image-Portrait-Placeholder.jpg"}
+                                />
+                            </div>
+                            <div className="flex flex-col grow">
+                                <div className="flex flex-col col-span-6">
+                                    <Link className="mb-3 text-4xl" href={formatImdbActorUrl(result.imdbId)} target="_blank">{result.name}</Link>
+                                    <p className="text-sm">Films: ...</p>
+                                    <p className="text-sm">Roles: ...</p>
+                                </div>
+                            </div>
+                        </div>
                     </CardBody>
                 </Card>
             ))}
