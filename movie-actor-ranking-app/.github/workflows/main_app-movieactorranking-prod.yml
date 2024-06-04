@@ -23,14 +23,14 @@ jobs:
       uses: docker/login-action@v2
       with:
         registry: https://tonylukeregistry.azurecr.io/
-        username: ${{ secrets.AzureAppService_ContainerUsername_28820fe3b86a42158f3cf84b428f2f1d }}
-        password: ${{ secrets.AzureAppService_ContainerPassword_e993b5e183ad4afea9a2c5dbdfb660c4 }}
+        username: ${{ secrets.AzureAppService_ContainerUsername_f23689bd09d3435391813a78e892ec99 }}
+        password: ${{ secrets.AzureAppService_ContainerPassword_739cc700fbfb43c8aef472eb44c5e7a3 }}
 
     - name: Build and push container image to registry
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: tonylukeregistry.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_28820fe3b86a42158f3cf84b428f2f1d }}/tonylukeregistry/movie-actor-ranking/app:${{ github.sha }}
+        tags: tonylukeregistry.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_f23689bd09d3435391813a78e892ec99 }}/movie-actor-ranking/app:${{ github.sha }}
         file: ./Dockerfile
 
   deploy:
@@ -47,5 +47,5 @@ jobs:
       with:
         app-name: 'app-movieactorranking-prod'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_0e5fb02a6ef94a619053c49865c99a35 }}
-        images: 'tonylukeregistry.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_28820fe3b86a42158f3cf84b428f2f1d }}/tonylukeregistry/movie-actor-ranking/app:${{ github.sha }}'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_a56ba1b88fc94bf4a71f2dbeec70c2d2 }}
+        images: 'tonylukeregistry.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_f23689bd09d3435391813a78e892ec99 }}/movie-actor-ranking/app:${{ github.sha }}'
