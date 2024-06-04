@@ -1,4 +1,5 @@
 # MovieActorRanking
+[![Build and deploy container app to Azure Web App - api-movieactorranking-prod](https://github.com/InformationRetrieval-Organization/MovieActorRankingSystem/actions/workflows/main_api-movieactorranking-prod.yml/badge.svg)](https://github.com/InformationRetrieval-Organization/MovieActorRankingSystem/actions/workflows/main_api-movieactorranking-prod.yml)
 
 ## documents
 
