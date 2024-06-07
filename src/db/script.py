@@ -47,21 +47,19 @@ async def create_one_script(
         print(f"An error occurred while creating the script: {e}")
 
 
-async def update_one_script(
-    script_id: int, dialogue: str, movie_id: int, role_id: int, processed_dialogue: str
-) -> models.Script:
+async def update_one_script(script: models.Script) -> models.Script:
     """
     Update a script in the database
     """
     try:
         async with Prisma() as db:
             script = await db.script.update(
-                where={"id": script_id},
+                where={"id": script.id},
                 data={
-                    "dialogue": dialogue,
-                    "movieId": movie_id,
-                    "roleId": role_id,
-                    "processedDialogue": processed_dialogue,
+                    "dialogue": script.dialogue,
+                    "movieId": script.movieId,
+                    "roleId": script.roleId,
+                    "processedDialogue": script.processedDialogue,
                 },
             )
             return script
