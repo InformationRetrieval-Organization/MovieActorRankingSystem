@@ -1,0 +1,39 @@
+{
+    "configurations": [
+        {
+            "name": "Python Debugger: FastAPI Script",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/main.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Python Debugger: Evaluation Script",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/evaluation/evaluation.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Python Debugger: GNews Script",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/data_crawlers/gnews_data_crawler.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Python Debugger: Guardian Script",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/data_crawlers/guardian_data_crawler.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Python Debugger: NYT Script",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/data_crawlers/nyt_data_crawler.py.py",
+            "console": "integratedTerminal"
+        }
+    ]
+}
