@@ -3,14 +3,12 @@ from typing import Dict, List, Set, Tuple
 import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
-from datetime import datetime
-from config import MAX_DATA_COEFFICIENT
 from prisma import models
 from db.script import (
     get_all_scripts,
     update_one_script,
 )
-from globals import _vocabulary
+import globals
 
 
 async def preprocess_scripts():
