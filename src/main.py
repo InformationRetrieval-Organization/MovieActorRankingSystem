@@ -19,7 +19,7 @@ async def lifespan(app: FastAPI):
 
     # TODO
     init_globals()
-    preprocess_scripts()
+    await preprocess_scripts()
     yield
 
 
