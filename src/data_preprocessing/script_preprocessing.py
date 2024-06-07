@@ -6,7 +6,7 @@ from nltk.tokenize import word_tokenize
 from prisma import models
 from db.script import (
     get_all_scripts,
-    update_one_script,
+    update_scripts,
 )
 import globals
 
@@ -28,8 +28,11 @@ async def preprocess_scripts():
     if len(scripts) != len(processed_scripts):
         # Preprocess the scripts
         print("Not all scripts are preprocessed, start preprocessing:")
+        unprocessed_scripts = [
+            script for script in scripts if script not in processed_scripts
+        ]
         new_processed_scripts, list_of_tokens = await preprocess_and_update_scripts(
-            scripts - processed_scripts
+            unprocessed_scripts
         )
         processed_scripts.extend(new_processed_scripts)
     else:
@@ -97,8 +100,7 @@ async def preprocess_and_update_scripts(
     list_of_tokens = handle_tokens(term_freq_map, list_of_tokens)
 
     # update the script in the datebase
-    for processed_script in processed_scripts:
-        await update_one_script(processed_script)
+    await update_scripts(processed_scripts)
 
     return processed_scripts, list_of_tokens
 
@@ -131,7 +133,7 @@ def preprocess_script(
     Preprocess a script.
     """
     # Remove special characters and convert to lowercase
-    content = script.title.lower() + " " + script.content.lower()  # Add the title
+    content = script.dialogue.lower()
     content = re.sub("[–!\"#$%&'()*+,-./:;<=‘>—?@[\]^_`�{|}~\n’“”]", "", content)
 
     # Remove non-english words
