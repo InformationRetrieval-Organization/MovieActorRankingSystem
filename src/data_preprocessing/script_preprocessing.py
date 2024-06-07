@@ -22,7 +22,7 @@ async def preprocess_scripts():
     # Get the scripts from the database
     scripts = await get_all_scripts()
     processed_scripts = [
-        script for script in scripts if script.processedDialogue
+        script for script in scripts if script.processedDialogue is not None
     ]  # get all scripts that are already preprocessed
 
     if len(scripts) != len(processed_scripts):
