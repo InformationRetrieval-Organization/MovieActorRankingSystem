@@ -7,15 +7,19 @@ from slowapi.util import get_remote_address
 from slowapi.middleware import SlowAPIMiddleware
 from slowapi.errors import RateLimitExceeded
 import uvicorn
+from globals import init_globals
+from data_preprocessing.script_preprocessing import preprocess_scripts
 
 limiter = Limiter(key_func=get_remote_address, default_limits=["30/minute"])
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("FastAPI app started.")
 
     # TODO
-
+    init_globals()
+    preprocess_scripts()
     yield
 
 
