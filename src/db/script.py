@@ -47,6 +47,28 @@ async def create_one_script(
         print(f"An error occurred while creating the script: {e}")
 
 
+async def update_one_script(
+    script_id: int, dialogue: str, movie_id: int, role_id: int, processed_dialogue: str
+) -> models.Script:
+    """
+    Update a script in the database
+    """
+    try:
+        async with Prisma() as db:
+            script = await db.script.update(
+                where={"id": script_id},
+                data={
+                    "dialogue": dialogue,
+                    "movieId": movie_id,
+                    "roleId": role_id,
+                    "processedDialogue": processed_dialogue,
+                },
+            )
+            return script
+    except Exception as e:
+        print(f"An error occurred while updating the script: {e}")
+
+
 async def delete_all_scripts() -> None:
     """
     Delete all scripts from the database and reset the auto-increment counter
