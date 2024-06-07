@@ -47,24 +47,46 @@ async def create_one_script(
         print(f"An error occurred while creating the script: {e}")
 
 
-async def update_one_script(script: models.Script) -> models.Script:
+async def update_scripts(scripts: List[models.Script]) -> None:
     """
-    Update a script in the database
+    Update a List of scripts in the database
     """
+    list_of_ids = [script.id for script in scripts]
+    list_of_scripts = []
+
+    for script in scripts:
+        list_of_scripts.append(
+            {
+                "id": script.id,
+                "dialogue": script.dialogue,
+                "movieId": script.movieId,
+                "roleId": script.roleId,
+                "processedDialogue": script.processedDialogue,
+            }
+        )
+
     try:
         async with Prisma() as db:
-            script = await db.script.update(
-                where={"id": script.id},
-                data={
-                    "dialogue": script.dialogue,
-                    "movieId": script.movieId,
-                    "roleId": script.roleId,
-                    "processedDialogue": script.processedDialogue,
-                },
-            )
-            return script
+            # Split list_of_ids into chunks of 32767, because SQL cant handle more
+            for i in range(0, len(list_of_ids), 32767):
+                chunk_of_ids = list_of_ids[i : i + 32767]
+
+                await db.script.delete_many(  # delete all scripts with the given ids
+                    where={"id": {"in": chunk_of_ids}}
+                )
+
+                list_of_scripts_with_id = [
+                    script for script in list_of_scripts if script["id"] in chunk_of_ids
+                ]
+
+                await db.script.create_many(  # reinsert the scripts
+                    data=list_of_scripts_with_id,
+                )
+            else:
+                print("No scripts to update.")
+
     except Exception as e:
-        print(f"An error occurred while updating the script: {e}")
+        print(f"An error occurred while updating the scripts: {e}")
 
 
 async def delete_all_scripts() -> None:
