@@ -10,12 +10,14 @@ def init_globals():
     global _S_reduced
     global _V_reduced
     global _document_svd_matrix
+    global _classifier
 
     _vocabulary = []  # List of str
-    _document_frequency = {} #TODO
+    _document_frequency = {}  # TODO
     _document_term_weight_matrix = []
     _document_id_vector_map = {}
     _U_reduced = []
     _S_reduced = []
     _V_reduced = []
     _document_svd_matrix = {}
+    _classifier = None
