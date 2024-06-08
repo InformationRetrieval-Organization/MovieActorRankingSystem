@@ -13,7 +13,7 @@ IMDB_URL = "https://www.imdb.com"
 IMSDB_URL = "https://www.imsdb.com"
 
 # File Paths
-CWD = os.getcwd()
+CWD = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Raw Files
 RAW_IMSDB_MOV_FILE_PATH = os.path.join(CWD, "data", "raw", "imsdb_movies.csv")
