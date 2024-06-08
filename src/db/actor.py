@@ -91,24 +91,38 @@ async def get_all_actors_dialogues() -> List[Dict]:
     """
     try:
         async with Prisma() as db:
-            result = await db.query_raw(
-                """
-                SELECT 
-                    a.id AS actor_id,
-                    a.name AS actor_name,
-                    STRING_AGG(s.dialogue, '') AS concatenated_dialogue
-                FROM 
-                    public."Actor" a
-                JOIN 
-                    public."Role" r ON a.id = r."actorId"
-                JOIN 
-                    public."Script" s ON r.id = s."roleId"
-                GROUP BY 
-                    a.id, a.name
-                ORDER BY 
-                    a.id ASC;
-                """
+            # Fetch actors with their dialogues
+            actors_with_scripts = await db.actor.find_many(
+                where={"roles": {"some": {"scripts": {"some": {}}}}},
+                include={
+                    "roles": {
+                        "include": {
+                            "scripts": {
+                                "where": {"processedDialogue": {"not": ""}},
+                            }
+                        }
+                    }
+                },
+                order={"id": "asc"},
             )
+
+            # Process the data to concatenate dialogues
+            result = []
+            for actor in actors_with_scripts:
+                concatenated_dialogue = " ".join(
+                    script.dialogue
+                    for role in actor.roles
+                    for script in role.scripts
+                    if script.processedDialogue
+                )
+
+                result.append(
+                    {
+                        "actor_id": actor.id,
+                        "actor_name": actor.name,
+                        "concatenated_dialogue": concatenated_dialogue,
+                    }
+                )
 
             return result
     except Exception as e:

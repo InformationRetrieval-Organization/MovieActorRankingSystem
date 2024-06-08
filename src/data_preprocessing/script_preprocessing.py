@@ -45,10 +45,10 @@ async def preprocess_scripts():
         print("Scripts are already preprocessed")
         list_of_tokens = await load_vocabulary()
 
-    _vocabulary = list_of_tokens
+    globals._vocabulary = list_of_tokens
 
     print(str(len(processed_scripts)) + " scripts came trough the preprocessing")
-    print("Length of Vocabulary: " + str(len(_vocabulary)))
+    print("Length of Vocabulary: " + str(len(globals._vocabulary)))
     print("Preprocessing completed")
 
 
