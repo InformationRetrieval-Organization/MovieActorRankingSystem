@@ -10,9 +10,10 @@ from db.script import (
 )
 import globals
 import csv
+from config import VOCABULARY_FILE_PATH, TERM_DOC_FREQ_FILE_PATH
 
-vocabulary_file_path = "../files/vocabulary.csv"
-term_doc_freq_file_path = "../files/term_freq_map.csv"
+vocabulary_file_path = VOCABULARY_FILE_PATH
+term_doc_freq_file_path = TERM_DOC_FREQ_FILE_PATH
 
 
 async def preprocess_scripts():

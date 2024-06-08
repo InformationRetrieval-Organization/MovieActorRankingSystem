@@ -34,3 +34,7 @@ PRO_IMDB_IMSDB_MOV_SCR_FILE_PATH = os.path.join(
 
 # Flask Environment
 FASTAPI_ENV = os.getenv("FASTAPI_ENV")
+
+# File Paths
+VOCABULARY_FILE_PATH = os.path.join(CWD, "files", "vocabulary.csv")
+TERM_DOC_FREQ_FILE_PATH = os.path.join(CWD, "files", "term_freq_map.csv")
