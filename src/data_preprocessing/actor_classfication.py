@@ -40,6 +40,8 @@ async def classify_actors():
 
     # iterate over all actors
     for actor in actors:
+        if actor.id <= 1534:  # Continue where last execution stopped
+            continue
         actor_roles = [role for role in roles if role.actorId == actor.id]
 
         # lists for the values of each classification
@@ -54,9 +56,14 @@ async def classify_actors():
         # iterate over all roles of the actor
         for role in actor_roles:
             # get all scripts of the role
-            role_scripts = [
-                script.dialogue for script in scripts if script.roleId == role.id
-            ]
+            role_scripts = []
+            for script in scripts:
+                if script.roleId == role.id:
+                    len_of_script = len(script.dialogue)
+                    if len_of_script > 512:
+                        script.dialogue = script.dialogue[:512]
+                    role_scripts.append(script.dialogue)
+
             # get the classification of the role scripts
             classification = get_classification(role_scripts)
 
