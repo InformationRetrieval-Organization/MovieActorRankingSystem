@@ -33,7 +33,7 @@ pip install --upgrade pip
 ```bash
 docker compose -f docker.compose.yml up -d
 prisma db push
-sh src/db/import_data.sh
+sh scripts/import_data.sh
 ```
 
 ### optional: pgadmin
