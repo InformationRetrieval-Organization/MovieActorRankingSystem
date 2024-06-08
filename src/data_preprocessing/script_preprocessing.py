@@ -98,6 +98,7 @@ async def preprocess_and_update_scripts(
         list_of_tokens.extend(tokens)
 
     list_of_tokens = handle_tokens(term_freq_map, list_of_tokens)
+    globals._document_frequency = term_freq_map
 
     # update the script in the datebase
     await update_scripts(processed_scripts)
@@ -122,6 +123,7 @@ async def calculate_vocabulary(processed_scripts: List[models.Script]) -> List[s
         list_of_tokens.extend(tokens)
 
     list_of_tokens = handle_tokens(term_freq_map, list_of_tokens)
+    globals._document_frequency = term_freq_map
 
     return list_of_tokens
 
