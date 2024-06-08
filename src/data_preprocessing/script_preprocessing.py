@@ -11,8 +11,8 @@ from db.script import (
 import globals
 import csv
 
-vocabulary_file_path = "files/vocabulary.csv"
-term_doc_freq_file_path = "files/term_freq_map.csv"
+vocabulary_file_path = "../files/vocabulary.csv"
+term_doc_freq_file_path = "../files/term_freq_map.csv"
 
 
 async def preprocess_scripts():
