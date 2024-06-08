@@ -17,3 +17,6 @@ cinemagoer
 tqdm
 fuzzywuzzy
 python-Levenshtein
+transformers
+torch
+torchvision
