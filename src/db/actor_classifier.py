@@ -9,7 +9,7 @@ async def get_all_actor_classifiers() -> List[models.ActorClassifier]:
     """
     try:
         async with Prisma() as db:
-            return await db.actor_classifier.find_many()
+            return await db.actorclassifier.find_many()
     except Exception as e:
         print(f"An error occurred while fetching actor classifiers: {e}")
         return []
@@ -23,7 +23,7 @@ async def create_many_actor_classifiers(
     """
     try:
         async with Prisma() as db:
-            result = await db.actor_classifier.create_many(data=actor_classifiers)
+            result = await db.actorclassifier.create_many(data=actor_classifiers)
             return result
     except Exception as e:
         print(f"An error occurred while creating the actor classifiers: {e}")
@@ -43,7 +43,7 @@ async def create_one_actor_classifier(
     """
     try:
         async with Prisma() as db:
-            actor_classifier = await db.actor_classifier.create(
+            actor_classifier = await db.actorclassifier.create(
                 data={
                     "actorId": actor_id,
                     "loveScore": love_score,
@@ -79,7 +79,7 @@ async def search_actor_classifier(actor_id: int) -> List[models.ActorClassifier]
     """
     try:
         async with Prisma() as db:
-            return await db.actor_classifier.find_many(where={"actorId": actor_id})
+            return await db.actorclassifier.find_many(where={"actorId": actor_id})
     except Exception as e:
         print(f"An error occurred while searching for the actor classifier: {e}")
         return []
@@ -91,7 +91,7 @@ async def search_actor_classifiers(actor_ids: List[int]) -> Dict[int, int]:
     """
     try:
         async with Prisma() as db:
-            actor_classifiers = await db.actor_classifier.find_many(
+            actor_classifiers = await db.actorclassifier.find_many(
                 where={"actorId": {"in": actor_ids}}
             )
             return {
