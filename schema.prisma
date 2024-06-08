@@ -24,6 +24,7 @@ model Actor {
   name        String
   headshotUrl String?
   roles       Role[]
+  classifiers ActorClassifier[]
 }
 
 model Role {
@@ -44,4 +45,16 @@ model Script {
   movieId  Int
   role     Role    @relation(fields: [roleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   roleId   Int
+}
+
+model ActorClassifier {
+  id      Int    @id @default(autoincrement())
+  actor   Actor  @relation(fields: [actorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  actorId Int
+  loveScore   Float?
+  joyScore    Float?
+  angerScore  Float?
+  sadnessScore Float?
+  surpriseScore Float?
+  fearScore Float?
 }
