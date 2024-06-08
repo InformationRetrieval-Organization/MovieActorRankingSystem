@@ -1,22 +1,24 @@
+from typing import List
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, pipeline
 from pprint import pprint
 
-model_name = "zbnsl/bert-base-uncased-emotionsModified"
+classifier = None
 
-# Download and load the model and tokenizer locally
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForSequenceClassification.from_pretrained(model_name)
+def load_classification_model():
+    model_name = "zbnsl/bert-base-uncased-emotionsModified"
 
-# Initialize the pipeline with the local model and tokenizer
-classifier = pipeline(
-    task="text-classification", model=model, tokenizer=tokenizer, top_k=None
-)
+    # Download and load the model and tokenizer locally
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModelForSequenceClassification.from_pretrained(model_name)
 
-# Input sentences for classification
-sentences = [
-    "I am happy",
-]
+    # Initialize the pipeline with the local model and tokenizer
+    classifier = pipeline(
+        task="text-classification", model=model, tokenizer=tokenizer, top_k=None
+    )
 
-# Perform classification
-model_outputs = classifier(sentences)
-pprint(model_outputs)
+def get_classification(text: List[str]):
+    if classifier == None:
+        load_classification_model()
+
+    # Perform classification
+    return classifier(text)
