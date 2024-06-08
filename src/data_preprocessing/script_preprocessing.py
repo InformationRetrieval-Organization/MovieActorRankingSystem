@@ -9,6 +9,10 @@ from db.script import (
     update_scripts,
 )
 import globals
+import csv
+
+vocabulary_file_path = "files/vocabulary.csv"
+term_doc_freq_file_path = "files/term_freq_map.csv"
 
 
 async def preprocess_scripts():
@@ -38,7 +42,7 @@ async def preprocess_scripts():
     else:
         # all scripts are already preprocessed
         print("Scripts are already preprocessed")
-        list_of_tokens = await calculate_vocabulary(processed_scripts)
+        list_of_tokens = await load_vocabulary()
 
     _vocabulary = list_of_tokens
 
@@ -103,24 +107,38 @@ async def preprocess_and_update_scripts(
     # update the script in the datebase
     await update_scripts(processed_scripts)
 
+    # Store list_of_tokens in a CSV file
+    with open(vocabulary_file_path, "w", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+        writer.writerow(list_of_tokens)
+
+    # Store term_freq_map in a CSV file
+    with open(term_doc_freq_file_path, "w", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+        for token, freq in term_freq_map.items():
+            writer.writerow([token, freq])
     return processed_scripts, list_of_tokens
 
 
-async def calculate_vocabulary(processed_scripts: List[models.Script]) -> List[str]:
+async def load_vocabulary() -> List[str]:
     """
-    Calculates the date coefficients and vocabulary for the processed posts.
+    lLoad the vocabulary and the processed scripts from CSV files.
     """
     list_of_tokens = []
     term_freq_map = {}
 
-    for processed_script in processed_scripts:
-        # Tokenize the processed script dialouge
-        tokens = processed_script.processedDialogue.split()
+    # Load list_of_tokens from CSV file
+    with open(vocabulary_file_path, "r", encoding="utf-8") as file:
+        reader = csv.reader(file)
+        for row in reader:
+            list_of_tokens.extend(row)
 
-        set_term_freq_map(term_freq_map, tokens)
-
-        # Add the tokens to the list of tokens
-        list_of_tokens.extend(tokens)
+    # Load term_freq_map from CSV file
+    with open(term_doc_freq_file_path, "r", encoding="utf-8") as file:
+        reader = csv.reader(file)
+        for row in reader:
+            token, freq = row
+            term_freq_map[token] = int(freq)
 
     list_of_tokens = handle_tokens(term_freq_map, list_of_tokens)
     globals._document_frequency = term_freq_map
