@@ -21,7 +21,7 @@ async def lifespan(app: FastAPI):
     # TODO
     init_globals()
     await preprocess_scripts()
-    #await build_vector_space_model() # is possible to execute if document frequency is implemented
+    await build_vector_space_model()  # is possible to execute if document frequency is implemented
     yield
 
 

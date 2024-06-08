@@ -3,7 +3,7 @@ from typing import Any, List
 import numpy as np
 from db.actor import get_all_actors
 from db.script import get_all_scripts
-from globals import _vocabulary, _document_frequency, _document_term_weight_matrix, _document_id_vector_map, _V_reduced, _S_reduced, _document_svd_matrix, _U_reduced
+import globals 
 
 async def search_vector_space_model(query: List[str]) -> List[int]: 
     """
@@ -15,20 +15,20 @@ async def search_vector_space_model(query: List[str]) -> List[int]:
     inverse_document_frequency = {}
     # Matrix dimension 1x1
 
-    for term in _vocabulary:
-        df = _document_frequency[term]
+    for term in globals._vocabulary:
+        df = globals._document_frequency[term]
         # Calculate the inverse document frequency (IDF) for each term
         inverse_document_frequency[term] = compute_inverse_document_frequency(total_documents, df)
  
     # creating the tfidf-query vector
-    tfidf_vector = [compute_tf_idf_weighting(compute_sublinear_tf_scaling(query.count(term)), inverse_document_frequency[term]) for term in _vocabulary]
+    tfidf_vector = [compute_tf_idf_weighting(compute_sublinear_tf_scaling(query.count(term)), inverse_document_frequency[term]) for term in globals._vocabulary]
 
     flat_transposed_query_vector = calculate_dimension_reduced_query(tfidf_vector)
 
     
     # Map each document by id to the corressponding cosinec similiarity
     doc_cosine_similiarity_map = {}
-    for doc_id, vector in _document_svd_matrix.items():
+    for doc_id, vector in globals._document_svd_matrix.items():
         # Calculate the Cosine similiarity by using the numpy library
         # Calculating the dot product between the Queryvector and the Documentvector
         dot_product = np.dot(flat_transposed_query_vector, vector)
@@ -51,7 +51,7 @@ async def build_vector_space_model():
     """
     Build the Vector Space Model
     """
-    vocabulary: List[str] = _vocabulary
+    vocabulary: List[str] = globals._vocabulary
     
     print("Building Vector Space Model")
         
@@ -64,7 +64,7 @@ async def build_vector_space_model():
 
     for term in vocabulary:
         # Calculate the df it is the length of the linked list of occurance documents for a particular term
-        df : int = _document_frequency[term]
+        df : int = globals._document_frequency[term]
         # Calculate the inverse document frequency (IDF) for each term
         inverse_document_frequency[term] = compute_inverse_document_frequency(total_documents, df)
 
@@ -74,8 +74,8 @@ async def build_vector_space_model():
         tfidf_vector = [compute_tf_idf_weighting(compute_sublinear_tf_scaling(actor_scripts_text.count(term)), inverse_document_frequency[term]) for term in vocabulary]
         # Matrix dimension is term x documents
         # matrix has now the dimension (524, 6643) => dokument to word if i want the word to ducment matrix i have to transpose the matrix
-        _document_term_weight_matrix.append(tfidf_vector)
-        _document_id_vector_map[actor.id] = tfidf_vector 
+        globals._document_term_weight_matrix.append(tfidf_vector)
+        globals._document_id_vector_map[actor.id] = tfidf_vector 
     
     
     print("Vector Space Model Built")
@@ -97,7 +97,7 @@ def calculate_dimension_reduced_query(tfidf_query_vector: List[float]) -> np.nda
     Calculate the dimension reduced query with the following formula: q = q^T * U_k * S_k^-1
     """
      # transpose tfidf vector to calculate the new dimensional reduced query vector
-    square_s_reduced = np.diag(_S_reduced)
+    square_s_reduced = np.diag(globals._S_reduced)
     # Check if the matrix is invertible
     if np.linalg.det(square_s_reduced) == 0:
         print("The matrix is singular and cannot be inverted.")
@@ -109,7 +109,7 @@ def calculate_dimension_reduced_query(tfidf_query_vector: List[float]) -> np.nda
     numpy_matrix_query = np.matrix(tfidf_query_vector)
     
     #calculate the new dimension reduced query with following formular q = q^T * U_k * S_k^-1
-    reduced_query_vector_U = np.dot(numpy_matrix_query, _U_reduced)
+    reduced_query_vector_U = np.dot(numpy_matrix_query, globals._U_reduced)
     reduced_query_vector = np.dot(reduced_query_vector_U, s_k_inv)
 
     # reduced query has the shape of (1,k); in order to calculate the cosine similiarity we need to transpose the vector back in the shape (k,1)
@@ -124,7 +124,7 @@ async def execute_singualar_value_decomposition():
     Singular Value Decomposition
     """
     print("Start Executing SVD")
-    documents_vector_list = list(_document_id_vector_map.items()) # get the list of documents and their vectors
+    documents_vector_list = list(globals._document_id_vector_map.items()) # get the list of documents and their vectors
     vector_list = [vector for _, vector in documents_vector_list] # get the list of vectors
     documentids_list = [doc_id for doc_id, _ in documents_vector_list] # get the list of document ids
     original_matrix = np.matrix(vector_list) # create a matrix from the list of vectors
@@ -142,15 +142,15 @@ async def execute_singualar_value_decomposition():
             break
             
     # reduce the dimensionality of the matrix
-    _U_reduced = U[:, :k]
-    S_reduced = S[:k]
+    globals._U_reduced = U[:, :k]
+    globals.S_reduced = S[:k]
     Vt_reduced = Vt[:k, :]
-    _V_reduced = Vt_reduced.transpose() # transpose the matrix to get the document to word matrix
+    globals._V_reduced = Vt_reduced.transpose() # transpose the matrix to get the document to word matrix
     
     # assign reduced eigenvectors to documents    
     i = 0
     for doc_id in documentids_list:
-        vector = np.ravel(_V_reduced[i,:]) # Get the ith row of the V_reduced matrix and convert it to a 1D array
-        _document_svd_matrix[doc_id] = vector 
+        vector = np.ravel(globals._V_reduced[i,:]) # Get the ith row of the V_reduced matrix and convert it to a 1D array
+        globals._document_svd_matrix[doc_id] = vector 
         i += 1
     print("SVD executed")
