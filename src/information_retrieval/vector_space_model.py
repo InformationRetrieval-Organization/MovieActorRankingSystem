@@ -89,18 +89,6 @@ async def build_vector_space_model():
                 
                 # Every post has its own vector these are created below and added in the corresponding maps
                 # Get the combined scripts text for the current actor
-                for term in globals._vocabulary:
-                    text = actor_dialogue[
-                        "concatenated_dialogue"
-                    ].lower()  # Convert text to lowercase
-                    term_frequency = text.split().count(
-                        term
-                    )  # Tokenize text and count occurrences of the term
-                    #print(term_frequency)
-                    sublinear_tf_scaling = compute_sublinear_tf_scaling(
-                        term_frequency
-                    )  # Compute sublinear TF scaling
-
                 tfidf_vector = [
                     compute_tf_idf_weighting(
                         compute_sublinear_tf_scaling(
