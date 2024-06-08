@@ -92,14 +92,13 @@ async def get_all_actors_dialogues() -> List[Dict]:
     try:
         async with Prisma() as db:
             # Fetch actors with their dialogues
-            print("Fetching actors with dialogues")
             actors_with_scripts = await db.actor.find_many(
                 where={"roles": {"some": {"scripts": {"some": {}}}}},
                 include={
                     "roles": {
                         "include": {
                             "scripts": {
-                                "where": {"dialogue": {"not": ""}},
+                                "where": {"processedDialogue": {"not": ""}},
                             }
                         }
                     }
@@ -114,7 +113,7 @@ async def get_all_actors_dialogues() -> List[Dict]:
                     script.dialogue
                     for role in actor.roles
                     for script in role.scripts
-                    if script.dialogue
+                    if script.processedDialogue
                 )
 
                 result.append(
