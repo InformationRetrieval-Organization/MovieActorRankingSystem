@@ -83,3 +83,34 @@ async def search_actors(names: List[str]) -> Dict[str, int]:
     except Exception as e:
         print(f"An error occurred while searching for the actors: {e}")
         return {}
+
+
+async def get_all_actors_dialogues() -> List[Dict]:
+    """
+    Fetch all actors from the database with their concatenated dialogues.
+    """
+    try:
+        async with Prisma() as db:
+            result = await db.query_raw(
+                """
+                SELECT 
+                    a.id AS actor_id,
+                    a.name AS actor_name,
+                    STRING_AGG(s.dialogue, '') AS concatenated_dialogue
+                FROM 
+                    public."Actor" a
+                JOIN 
+                    public."Role" r ON a.id = r."actorId"
+                JOIN 
+                    public."Script" s ON r.id = s."roleId"
+                GROUP BY 
+                    a.id, a.name
+                ORDER BY 
+                    a.id ASC;
+                """
+            )
+
+            return result
+    except Exception as e:
+        print(f"An error occurred while fetching actors: {e}")
+        return []
