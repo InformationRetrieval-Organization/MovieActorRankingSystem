@@ -1,11 +1,14 @@
 import math
 from typing import Any, List
 import numpy as np
-from db.actor import get_all_actors, get_all_actors_dialogues
+from db.actor import get_all_actors, get_all_actors_dialogues_processed
 from db.script import get_all_scripts
 from db.role import get_all_roles
 import globals
 from tqdm import tqdm
+from concurrent.futures import ProcessPoolExecutor
+import os
+from prisma import models
 
 
 async def search_vector_space_model(query: List[str]) -> List[int]:
@@ -60,6 +63,25 @@ async def search_vector_space_model(query: List[str]) -> List[int]:
     return sorted_doc_ids
 
 
+def compute_tfidf_vector(vocabulary, actor: models.Actor, inverse_document_frequency):
+    # Get all processed dialogues for an actor
+    all_processed_dialogues = " ".join(
+        script.processedDialogue
+        for role in actor.roles
+        for script in role.scripts
+        if script.processedDialogue
+    )
+
+    tfidf_vector = [
+        compute_tf_idf_weighting(
+            compute_sublinear_tf_scaling(all_processed_dialogues.count(term)),
+            inverse_document_frequency[term],
+        )
+        for term in vocabulary
+    ]
+    return actor.id, tfidf_vector
+
+
 async def build_vector_space_model():
     """
     Build the Vector Space Model
@@ -68,10 +90,10 @@ async def build_vector_space_model():
 
     print("Building Vector Space Model")
 
-    actors_dialogues = await get_all_actors_dialogues()
+    actors = await get_all_actors_dialogues_processed()
 
     # Calculate the document frequency (DF) for each term
-    total_documents = len(actors_dialogues)
+    total_documents = len(actors)
     inverse_document_frequency = {}
 
     for term in globals._vocabulary:
@@ -82,23 +104,26 @@ async def build_vector_space_model():
             total_documents, df
         )
 
-    for actor_dialogue in tqdm(actors_dialogues):
-        # Every post has its own vector these are created below and added in the corresponding maps
-        # Get the combined scripts text for the current actor
-        tfidf_vector = [
-            compute_tf_idf_weighting(
-                compute_sublinear_tf_scaling(
-                    actor_dialogue["concatenated_dialogue"].count(term)
+    # Calculate the tfidf vector for each actor
+    with ProcessPoolExecutor(max_workers=os.cpu_count()) as executor:
+        results = list(
+            tqdm(
+                executor.map(
+                    compute_tfidf_vector,
+                    globals._vocabulary,
+                    actors,
+                    inverse_document_frequency,
                 ),
-                inverse_document_frequency[term],
+                total=len(actors),
             )
-            for term in globals._vocabulary
-        ]
-        # print(tfidf_vector)
+        )
+
+    for actor_id, tfidf_vector in results:
         globals._document_term_weight_matrix.append(tfidf_vector)
-        globals._document_id_vector_map[actor_dialogue["actor_id"]] = tfidf_vector
-    # print("Vector Space Model Built")
-    # print(globals._document_id_vector_map)
+        globals._document_id_vector_map[actor_id] = tfidf_vector
+
+    print("Vector Space Model Built")
+    print(globals._document_id_vector_map)
 
 
 def compute_inverse_document_frequency(N: int, df: int) -> float:
