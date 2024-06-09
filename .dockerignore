@@ -2,6 +2,8 @@
 **/*.pyc
 .vscode/
 .venv/
+data/
+scripts/
 Dockerfile
 .dockerignore
 README.md
