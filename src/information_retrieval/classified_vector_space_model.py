@@ -1,5 +1,5 @@
 import math
-from typing import Any, List
+from typing import Any, List, Dict
 import numpy as np
 from db.actor import (
     get_actors_by_ids,
@@ -19,7 +19,6 @@ async def search_classified_vector_space_model(query: List[str]) -> List[int]:
     """
     Creates the Queryvector and calculates the cosine similiarity between the Queryvector and the Actor vectors
     """
-    actor_cosine_similiarity_map = {}
     # Get synonyms for the query terms
     query_synonyms = []
     for term in query:
@@ -29,9 +28,11 @@ async def search_classified_vector_space_model(query: List[str]) -> List[int]:
     query_terms = list(set(query_synonyms))
 
     # Assuming we have a function to classify a text and get its vector representation
-    query_classification_map = await classify_query(query_terms)
+    query_classification_map = await classify_query(query)
+    print("This is the query class map", query_classification_map)
 
     query_vector = compute_query_vector(query_classification_map)
+    print(query_vector)
 
     # Calculate cosine similarity between the query vector and actor vectors
     actor_cosine_similarity_map = {}
@@ -72,7 +73,7 @@ async def build_classified_vector_space_model():
     for actor in tqdm(classified_actors):
         # Calculate the vector for the actor
         vector = calculate_actor_vector(actor)
-        globals._classified_actors_vector_map[actor.id] = vector
+        globals._classified_actors_vector_map[actor.actorId] = vector
 
     print("Building classified vector space model completed")
 
@@ -91,7 +92,7 @@ def calculate_actor_vector(actor: models.ActorClassifier) -> List[float]:
     return vector
 
 
-def get_some_word_synonyms(word):
+def get_some_word_synonyms(word: str) -> List[str]:
     word = word.lower()
     synonyms = []
     synsets = wn.synsets(word)
@@ -106,7 +107,7 @@ def get_some_word_synonyms(word):
     return synonyms
 
 
-async def classify_query(query):
+async def classify_query(query: List[str]) -> List[Dict]:
     """
     Classify query based on their content and return a vector.
     """
@@ -129,6 +130,8 @@ async def classify_query(query):
         for label_score in classification:
             label = label_score["label"]
             score = label_score["score"]
+            if label == "love":
+                print("Love:" + str(score))
             label_scores[label].append(score)
         # Append the label_scores dictionary to the query_classifications list
         query_classifications.append(label_scores)
@@ -136,7 +139,7 @@ async def classify_query(query):
     return query_classifications
 
 
-def compute_query_vector(query_clasifications):
+def compute_query_vector(query_clasifications: List[Dict]) -> List[float]:
 
     # Initialize a dictionary to store the sum of scores for each label
     label_sum = {
