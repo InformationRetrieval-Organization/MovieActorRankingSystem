@@ -18,7 +18,7 @@ router = APIRouter()
         429: {"description": "Too Many Requests"},
     },
 )
-async def search_actor(q: str) -> List[models.Actor]:
+async def search_classifier_actor(q: str) -> List[models.Actor]:
     """
     Search for actors by classifier vector space.<br>
     Example usage: http://127.0.0.1:8000/search/classifier/actor?q=handsome%20man
@@ -40,7 +40,7 @@ async def search_actor(q: str) -> List[models.Actor]:
         429: {"description": "Too Many Requests"},
     },
 )
-async def search_token_vectorspace_actor(q: str) -> List[models.Actor]:
+async def search_token_actor(q: str) -> List[models.Actor]:
     """
     Search for actors by token vector space.<br>
     Example usage: http://127.0.0.1:8000/search/token/actor?q=handsome%20man
