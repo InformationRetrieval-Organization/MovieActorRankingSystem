@@ -11,11 +11,11 @@ import os
 from prisma import models
 
 
-async def search_token_vector_space_model(query: List[str]) -> List[int]:
+async def search_token_vector_space_model(query: str) -> List[int]:
     """
     Creates the Queryvector and calculates the cosine similiarity between the Queryvector and the Documentvectors
     """
-    actors = get_all_actors()
+    actors = await get_all_actors()
     # Calculate the document frequency (DF) for each term
     total_documents = len(actors)
     inverse_document_frequency = {}
