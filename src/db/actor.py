@@ -45,6 +45,18 @@ async def create_one_actor(name: str, imdb_id: int, headshot_url: str) -> models
         print(f"An error occurred while creating the actor: {e}")
 
 
+async def get_actors_by_ids(ids: List[int]) -> List[models.Actor]:
+    """
+    Fetch actors from the database by their IDs
+    """
+    try:
+        async with Prisma() as db:
+            return await db.actor.find_many(where={"id": {"in": ids}})
+    except Exception as e:
+        print(f"An error occurred while fetching actors: {e}")
+        return []
+
+
 async def delete_all_actors() -> None:
     """
     Delete all actors from the database and reset the auto-increment counter
