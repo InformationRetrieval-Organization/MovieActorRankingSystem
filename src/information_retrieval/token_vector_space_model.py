@@ -86,8 +86,6 @@ async def build_token_vector_space_model():
     """
     Build the Vector Space Model
     """
-    print(globals._vocabulary)
-
     print("Building Vector Space Model")
 
     actors = await get_all_actors_dialogues_processed()
@@ -125,7 +123,6 @@ async def build_token_vector_space_model():
         globals._document_id_vector_map[actor_id] = tfidf_vector
 
     print("Vector Space Model Built")
-    print(globals._document_id_vector_map)
 
 
 def compute_inverse_document_frequency(N: int, df: int) -> float:

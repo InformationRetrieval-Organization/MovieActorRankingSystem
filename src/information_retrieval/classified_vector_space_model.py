@@ -31,15 +31,17 @@ async def build_classified_vector_space_model():
     """
     Calculate the vectors for every actor based on their classification
     """
+
+    print("Building classified vector space model")
     # Get all classified actors
     classified_actors = await get_all_actor_classifiers()
     # Caculate vectors for each actor
-    for actor in classified_actors:
+    for actor in tqdm(classified_actors):
         # Calculate the vector for the actor
         vector = calculate_actor_vector(actor)
         globals._classified_actors_vector_map[actor.id] = vector
 
-    print(globals._classified_actors_vector_map)
+    print("Building classified vector space model completed")
 
 
 def calculate_actor_vector(actor: models.ActorClassifier) -> List[float]:
@@ -47,9 +49,10 @@ def calculate_actor_vector(actor: models.ActorClassifier) -> List[float]:
     Read the values for the classification and calculate the vector for the actor
     """
     vector = []
-    vector.extend(actor.angerScore)
-    vector.extend(actor.fearScore)
-    vector.extend(actor.joyScore)
-    vector.extend(actor.sadnessScore)
-    vector.extend(actor.loveScore)
-    vector.extend(actor.surpriseScore)
+    vector.append(actor.angerScore)
+    vector.append(actor.fearScore)
+    vector.append(actor.joyScore)
+    vector.append(actor.sadnessScore)
+    vector.append(actor.loveScore)
+    vector.append(actor.surpriseScore)
+    return vector

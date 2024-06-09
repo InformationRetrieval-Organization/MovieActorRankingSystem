@@ -27,8 +27,8 @@ async def lifespan(app: FastAPI):
     init_globals()
     load_classification_model()
     await preprocess_scripts()
-    await build_token_vector_space_model()
     await build_classified_vector_space_model()
+    await build_token_vector_space_model()
     yield
 
 
