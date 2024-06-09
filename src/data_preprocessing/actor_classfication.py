@@ -1,125 +1,168 @@
-from typing import List
-from transformers import AutoTokenizer, AutoModelForSequenceClassification, pipeline
+from typing import List, Dict, Union
 from prisma import models
-from db.script import get_all_scripts
-from db.actor import get_all_actors
-from db.role import get_all_roles
-from db.actor_classifier import create_one_actor_classifier
-import globals
+from db.actor_classifier import create_many_actor_classifiers
+from db.actor import get_all_actors_dialogues
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from tqdm import tqdm
+from utils.classification import get_classification
+import os
+import asyncio
 
 
-def load_classification_model() -> pipeline:
-    model_name = "zbnsl/bert-base-uncased-emotionsModified"
+def split_text_into_chunks(
+    text: str, split_by: str = ".", max_length: int = 512
+) -> List[str]:
+    """
+    Split text into chunks of a specified maximum length, without splitting sentences.
 
-    # Download and load the model and tokenizer locally
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForSequenceClassification.from_pretrained(model_name)
+    Args:
+        text (str): The text to split.
+        max_length (int): The maximum length of each chunk.
 
-    # Initialize the pipeline with the local model and tokenizer
-    globals._classifier = pipeline(
-        task="text-classification", model=model, tokenizer=tokenizer, top_k=None
-    )
-    return globals._classifier
+    Returns:
+        List[str]: A list of text chunks.
+    """
+    sentences = text.split(split_by)
+    chunks = []
+    current_chunk = ""
+
+    for sentence in sentences:
+        # Add 1 for the period at the end of the sentence
+        if len(current_chunk) + len(sentence) + 1 > max_length:
+            # If the current sentence is longer than max_length, split it into smaller chunks
+            if len(sentence) > max_length:
+                for i in range(0, len(sentence), max_length):
+                    chunks.append(sentence[i : i + max_length])
+            else:
+                chunks.append(current_chunk)
+                current_chunk = sentence
+        else:
+            current_chunk += (split_by if current_chunk else "") + sentence
+
+    if current_chunk:
+        chunks.append(current_chunk)
+
+    return chunks
 
 
-def get_classification(text: List[str]):
-    if globals._classifier == None:
-        globals._classifier = load_classification_model()
+def classify_actor_dialogues(
+    actors: List[models.Actor],
+) -> Dict[int, Dict[str, List[float]]]:
+    """
+    Classify the dialogues of actors and return the classification results.
 
-    # Perform classification
-    return globals._classifier(text)
+    Args:
+        actor_dialogues (List[Dict[str, Union[int, str]]]): List of actor dialogues.
+
+    Returns:
+        Dict[int, Dict[str, List[float]]]: Classification results for each actor.
+    """
+    actor_classifications = {}
+
+    for actor in actors:
+        actor_id = actor.id
+
+        # Concatenate all dialogues of the actor
+        all_dialogues = ".".join(
+            script.dialogue
+            for role in actor.roles
+            for script in role.scripts
+            if script.dialogue
+        )
+
+        dialogue_chunks = split_text_into_chunks(all_dialogues)
+
+        classifications = get_classification(dialogue_chunks)
+
+        if actor_id not in actor_classifications:
+            actor_classifications[actor_id] = {
+                "sadness": [],
+                "joy": [],
+                "anger": [],
+                "fear": [],
+                "surprise": [],
+                "love": [],
+            }
+
+        for classification in classifications:
+            for label_score in classification:
+                label = label_score["label"]
+                score = label_score["score"]
+                actor_classifications[actor_id][label].append(score)
+
+    return actor_classifications
 
 
 async def classify_actors():
-    # Get all scripts, roles and actors from the database
-    scripts = await get_all_scripts()
-    roles = await get_all_roles()
-    actors = await get_all_actors()
+    """
+    Classify all actors based on their dialogues and store the results in the database.
+    """
+    # Get all actor dialogues from the database
+    actor_dialogues = await get_all_actors_dialogues()
 
-    actors_classification = {}  # dictionary to store the classification of each actor
+    actors_classification = {}  # Dictionary to store the classification of each actor
 
-    # iterate over all actors
-    for actor in actors:
-        if actor.id <= 1534:  # Continue where last execution stopped
-            continue
-        actor_roles = [role for role in roles if role.actorId == actor.id]
+    with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
+        loop = asyncio.get_event_loop()
+        futures = [
+            loop.run_in_executor(executor, classify_actor_dialogues, [actor_dialogue])
+            for actor_dialogue in actor_dialogues
+        ]
+        for future in tqdm(as_completed(futures), total=len(futures)):
+            batch_classifications = await future
+            for actor_id, classification in batch_classifications.items():
+                if actor_id not in actors_classification:
+                    actors_classification[actor_id] = {
+                        "sadness": [],
+                        "joy": [],
+                        "anger": [],
+                        "fear": [],
+                        "surprise": [],
+                        "love": [],
+                    }
+                for label, scores in classification.items():
+                    actors_classification[actor_id][label].extend(scores)
 
-        # lists for the values of each classification
-        actor_sadness = []
-        actor_joy = []
-        actor_anger = []
-        actor_fear = []
-        actor_surprise = []
-        actor_love = []
-
-        done = 0
-        # iterate over all roles of the actor
-        for role in actor_roles:
-            # get all scripts of the role
-            role_scripts = []
-            for script in scripts:
-                if script.roleId == role.id:
-                    len_of_script = len(script.dialogue)
-                    if len_of_script > 512:
-                        script.dialogue = script.dialogue[:512]
-                    role_scripts.append(script.dialogue)
-
-            # get the classification of the role scripts
-            classification = get_classification(role_scripts)
-
-            # iterate over the classification and store in the corresponding lists
-            for i in range(len(classification)):
-                for j in range(len(classification[i])):
-                    if classification[i][j]["label"] == "sadness":
-                        actor_sadness.append(classification[i][j]["score"])
-                    elif classification[i][j]["label"] == "joy":
-                        actor_joy.append(classification[i][j]["score"])
-                    elif classification[i][j]["label"] == "anger":
-                        actor_anger.append(classification[i][j]["score"])
-                    elif classification[i][j]["label"] == "fear":
-                        actor_fear.append(classification[i][j]["score"])
-                    elif classification[i][j]["label"] == "surprise":
-                        actor_surprise.append(classification[i][j]["score"])
-                    elif classification[i][j]["label"] == "love":
-                        actor_love.append(classification[i][j]["score"])
-
-        # calculate the average value of each classification
-        actor_sadness_value = (
-            sum(actor_sadness) / len(actor_sadness) if len(actor_sadness) > 0 else 0
-        )
-        actor_joy_value = sum(actor_joy) / len(actor_joy) if len(actor_joy) > 0 else 0
-        actor_anger_value = (
-            sum(actor_anger) / len(actor_anger) if len(actor_anger) > 0 else 0
-        )
-        actor_fear_value = (
-            sum(actor_fear) / len(actor_fear) if len(actor_fear) > 0 else 0
-        )
-        actor_surprise_value = (
-            sum(actor_surprise) / len(actor_surprise) if len(actor_surprise) > 0 else 0
-        )
-        actor_love_value = (
-            sum(actor_love) / len(actor_love) if len(actor_love) > 0 else 0
+    # Prepare data for bulk insertion
+    actor_classifiers = []
+    for actor_id, classification in actors_classification.items():
+        actor_classifiers.append(
+            {
+                "actorId": actor_id,
+                "loveScore": (
+                    sum(classification["love"]) / len(classification["love"])
+                    if len(classification["love"]) > 0
+                    else 0
+                ),
+                "joyScore": (
+                    sum(classification["joy"]) / len(classification["joy"])
+                    if len(classification["joy"]) > 0
+                    else 0
+                ),
+                "angerScore": (
+                    sum(classification["anger"]) / len(classification["anger"])
+                    if len(classification["anger"]) > 0
+                    else 0
+                ),
+                "sadnessScore": (
+                    sum(classification["sadness"]) / len(classification["sadness"])
+                    if len(classification["sadness"]) > 0
+                    else 0
+                ),
+                "surpriseScore": (
+                    sum(classification["surprise"]) / len(classification["surprise"])
+                    if len(classification["surprise"]) > 0
+                    else 0
+                ),
+                "fearScore": (
+                    sum(classification["fear"]) / len(classification["fear"])
+                    if len(classification["fear"]) > 0
+                    else 0
+                ),
+            }
         )
 
-        # store the classification in the dictionary
-        actors_classification[actor.id] = {
-            "sadness": actor_sadness_value,
-            "joy": actor_joy_value,
-            "anger": actor_anger_value,
-            "fear": actor_fear_value,
-            "surprise": actor_surprise_value,
-            "love": actor_love_value,
-        }
-        # Create entry in DB
-        await create_one_actor_classifier(
-            actor_id=actor.id,
-            love_score=actors_classification[actor.id]["love"],
-            joy_score=actors_classification[actor.id]["joy"],
-            anger_score=actors_classification[actor.id]["anger"],
-            sadness_score=actors_classification[actor.id]["sadness"],
-            surprise_score=actors_classification[actor.id]["surprise"],
-            fear_score=actors_classification[actor.id]["fear"],
-        )
-        done += 1
-        percentage = (done / len(actors)) * 100
-        print(f"Actor {actor.id} classified successfully. Progress: {percentage}%")
+    # Bulk insert actor classifiers
+    await create_many_actor_classifiers(actor_classifiers)
+
+    print("All actors classified successfully.")
