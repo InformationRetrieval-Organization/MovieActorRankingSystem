@@ -10,7 +10,7 @@ import uvicorn
 from globals import init_globals
 from data_preprocessing.script_preprocessing import preprocess_scripts
 from information_retrieval.vector_space_model import build_vector_space_model
-from data_preprocessing.actor_classfication import load_classification_model
+from utils.classification import load_classification_model
 
 limiter = Limiter(key_func=get_remote_address, default_limits=["30/minute"])
 
