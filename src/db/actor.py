@@ -85,7 +85,34 @@ async def search_actors(names: List[str]) -> Dict[str, int]:
         return {}
 
 
-async def get_all_actors_dialogues() -> List[Dict]:
+async def get_all_actors_dialogues() -> List[models.Actor]:
+    """
+    Fetch all actors from the database with their concatenated dialogues.
+    """
+    try:
+        async with Prisma() as db:
+            # Fetch actors with their dialogues
+            actors_with_scripts = await db.actor.find_many(
+                where={"roles": {"some": {"scripts": {"some": {}}}}},
+                include={
+                    "roles": {
+                        "include": {
+                            "scripts": {
+                                "where": {"dialogue": {"not": ""}},
+                            }
+                        }
+                    }
+                },
+                order={"id": "asc"},
+            )
+
+            return actors_with_scripts
+    except Exception as e:
+        print(f"An error occurred while fetching actors: {e}")
+        return []
+
+
+async def get_all_actors_dialogues_processed() -> List[models.Actor]:
     """
     Fetch all actors from the database with their concatenated dialogues.
     """
@@ -106,25 +133,7 @@ async def get_all_actors_dialogues() -> List[Dict]:
                 order={"id": "asc"},
             )
 
-            # Process the data to concatenate dialogues
-            result = []
-            for actor in actors_with_scripts:
-                concatenated_dialogue = " ".join(
-                    script.dialogue
-                    for role in actor.roles
-                    for script in role.scripts
-                    if script.processedDialogue
-                )
-
-                result.append(
-                    {
-                        "actor_id": actor.id,
-                        "actor_name": actor.name,
-                        "concatenated_dialogue": concatenated_dialogue,
-                    }
-                )
-
-            return result
+            return actors_with_scripts
     except Exception as e:
         print(f"An error occurred while fetching actors: {e}")
         return []
