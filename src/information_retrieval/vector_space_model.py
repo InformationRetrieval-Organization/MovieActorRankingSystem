@@ -75,7 +75,7 @@ def compute_tfidf_vector(vocabulary, actor: models.Actor, inverse_document_frequ
     tfidf_vector = [
         compute_tf_idf_weighting(
             compute_sublinear_tf_scaling(all_processed_dialogues.count(term)),
-            inverse_document_frequency[term],
+            inverse_document_frequency.get(term, 0),
         )
         for term in vocabulary
     ]
@@ -98,7 +98,9 @@ async def build_vector_space_model():
 
     for term in globals._vocabulary:
         # Calculate the df it is the length of the linked list of occurance documents for a particular term
-        df: int = globals._document_frequency[term]
+        df: int = globals._document_frequency.get(
+            term, 0
+        )  # Use .get() to avoid KeyError
         # Calculate the inverse document frequency (IDF) for each term
         inverse_document_frequency[term] = compute_inverse_document_frequency(
             total_documents, df
@@ -110,9 +112,9 @@ async def build_vector_space_model():
             tqdm(
                 executor.map(
                     compute_tfidf_vector,
-                    globals._vocabulary,
+                    [globals._vocabulary] * len(actors),
                     actors,
-                    inverse_document_frequency,
+                    [inverse_document_frequency] * len(actors),
                 ),
                 total=len(actors),
             )
