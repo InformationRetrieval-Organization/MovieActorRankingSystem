@@ -1,9 +1,9 @@
 import math
 from typing import Any, List
 import numpy as np
-from db.actor import get_all_actors, get_all_actors_dialogues_processed
-from db.script import get_all_scripts
-from db.role import get_all_roles
+from db.actor import (
+    get_actors_by_ids,
+)
 import globals
 from tqdm import tqdm
 from concurrent.futures import ProcessPoolExecutor
@@ -40,12 +40,24 @@ async def search_classified_vector_space_model(query: List[str]) -> List[int]:
         magnitude_query = np.linalg.norm(query_vector)
         magnitude_entry = np.linalg.norm(vector)
         cosine_similarity = dot_product / (magnitude_query * magnitude_entry)
-        print(cosine_similarity)
+
+        # print(cosine_similarity)
         actor_cosine_similarity_map[actor_id] = cosine_similarity
 
-    #TODO figure out how to retrun the ids of the actors
+    # sort cosine similarity descending
+    sorted_actor_cosine_similarity_map = {
+        k: v
+        for k, v in sorted(
+            actor_cosine_similarity_map.items(), key=lambda item: item[1], reverse=True
+        )
+    }
 
-    return []
+    # return the top 10 actors
+    top_10_actors = await get_actors_by_ids(
+        list(sorted_actor_cosine_similarity_map.keys())[:10]
+    )
+
+    return top_10_actors
 
 
 async def build_classified_vector_space_model():
