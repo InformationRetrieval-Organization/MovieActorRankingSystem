@@ -32,7 +32,7 @@ async def lifespan(app: FastAPI):
     await classify_actors()
 
     await build_classified_vector_space_model()
-    await build_token_vector_space_model()
+    #await build_token_vector_space_model()
     #await execute_singualar_value_decomposition()
     yield
 
