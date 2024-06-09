@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from prisma import models
 from typing import List
 from db.actor import search_actor as search_actor_db
-from information_retrieval.vector_space_model import search_vector_space_model
+from information_retrieval.token_vector_space_model import search_vector_space_model
 
 router = APIRouter()
 

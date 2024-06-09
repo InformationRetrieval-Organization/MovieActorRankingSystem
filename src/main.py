@@ -9,7 +9,7 @@ from slowapi.errors import RateLimitExceeded
 import uvicorn
 from globals import init_globals
 from data_preprocessing.script_preprocessing import preprocess_scripts
-from information_retrieval.vector_space_model import build_vector_space_model
+from information_retrieval.token_vector_space_model import build_vector_space_model
 from utils.classification import load_classification_model
 
 limiter = Limiter(key_func=get_remote_address, default_limits=["30/minute"])
