@@ -9,3 +9,4 @@ Dockerfile
 README.md
 docker.compose.yml
 .env.sample
+database_dump.sql
