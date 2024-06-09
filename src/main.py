@@ -10,7 +10,7 @@ import uvicorn
 from globals import init_globals
 from data_preprocessing.script_preprocessing import preprocess_scripts
 from information_retrieval.token_vector_space_model import (
-    build_token_vector_space_model,
+    build_token_vector_space_model, execute_singualar_value_decomposition
 )
 from information_retrieval.classified_vector_space_model import (
     build_classified_vector_space_model,
@@ -33,6 +33,7 @@ async def lifespan(app: FastAPI):
 
     await build_classified_vector_space_model()
     await build_token_vector_space_model()
+    #await execute_singualar_value_decomposition()
     yield
 
 
