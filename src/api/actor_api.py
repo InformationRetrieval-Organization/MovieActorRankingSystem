@@ -13,15 +13,15 @@ router = APIRouter()
 
 
 @router.get(
-    "/search/actor",
+    "/search/classifier/actor",
     responses={
         429: {"description": "Too Many Requests"},
     },
 )
 async def search_actor(q: str) -> List[models.Actor]:
     """
-    Search for actors by name.<br>
-    Example usage: http://127.0.0.1:8000/search/actor
+    Search for actors by classifier vector space.<br>
+    Example usage: http://127.0.0.1:8000/search/classifier/actor?q=handsome%20man
     """
     query = q
     print(f"Query: {query}")
@@ -35,14 +35,15 @@ async def search_actor(q: str) -> List[models.Actor]:
 
 
 @router.get(
-    "/search/token_vectorspace/actor",
+    "/search/token/actor",
     responses={
         429: {"description": "Too Many Requests"},
     },
 )
 async def search_token_vectorspace_actor(q: str) -> List[models.Actor]:
     """
-    Search for actors by token vector space
+    Search for actors by token vector space.<br>
+    Example usage: http://127.0.0.1:8000/search/token/actor?q=handsome%20man
     """
     query = q
     print(f"Query: {query}")
