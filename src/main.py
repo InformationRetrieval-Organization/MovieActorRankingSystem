@@ -9,7 +9,12 @@ from slowapi.errors import RateLimitExceeded
 import uvicorn
 from globals import init_globals
 from data_preprocessing.script_preprocessing import preprocess_scripts
-from information_retrieval.token_vector_space_model import build_vector_space_model
+from information_retrieval.token_vector_space_model import (
+    build_token_vector_space_model,
+)
+from information_retrieval.classified_vector_space_model import (
+    build_classified_vector_space_model,
+)
 from utils.classification import load_classification_model
 
 limiter = Limiter(key_func=get_remote_address, default_limits=["30/minute"])
@@ -19,11 +24,11 @@ limiter = Limiter(key_func=get_remote_address, default_limits=["30/minute"])
 async def lifespan(app: FastAPI):
     print("FastAPI app started.")
 
-    # TODO
     init_globals()
     load_classification_model()
     await preprocess_scripts()
-    await build_vector_space_model()  # is possible to execute if document frequency is implemented
+    await build_token_vector_space_model()
+    await build_classified_vector_space_model()
     yield
 
 

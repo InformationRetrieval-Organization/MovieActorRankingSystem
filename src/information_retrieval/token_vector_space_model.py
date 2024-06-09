@@ -11,7 +11,7 @@ import os
 from prisma import models
 
 
-async def search_vector_space_model(query: List[str]) -> List[int]:
+async def search_token_vector_space_model(query: List[str]) -> List[int]:
     """
     Creates the Queryvector and calculates the cosine similiarity between the Queryvector and the Documentvectors
     """
@@ -82,7 +82,7 @@ def compute_tfidf_vector(vocabulary, actor: models.Actor, inverse_document_frequ
     return actor.id, tfidf_vector
 
 
-async def build_vector_space_model():
+async def build_token_vector_space_model():
     """
     Build the Vector Space Model
     """
