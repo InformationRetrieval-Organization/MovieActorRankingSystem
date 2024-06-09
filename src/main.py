@@ -16,6 +16,7 @@ from information_retrieval.classified_vector_space_model import (
     build_classified_vector_space_model,
 )
 from utils.classification import load_classification_model
+from data_preprocessing.actor_classfication import classify_actors
 
 limiter = Limiter(key_func=get_remote_address, default_limits=["30/minute"])
 
@@ -26,7 +27,10 @@ async def lifespan(app: FastAPI):
 
     init_globals()
     load_classification_model()
+
     await preprocess_scripts()
+    await classify_actors()
+
     await build_classified_vector_space_model()
     await build_token_vector_space_model()
     yield

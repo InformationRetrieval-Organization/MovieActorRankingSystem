@@ -1,6 +1,6 @@
 from typing import List, Dict, Union
 from prisma import models
-from db.actor_classifier import create_many_actor_classifiers
+from db.actor_classifier import create_many_actor_classifiers, get_all_actor_classifiers
 from db.actor import get_all_actors_dialogues
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from tqdm import tqdm
@@ -97,8 +97,15 @@ async def classify_actors():
     """
     Classify all actors based on their dialogues and store the results in the database.
     """
+    print("Classifying actors...")
+
     # Get all actor dialogues from the database
     actor_dialogues = await get_all_actors_dialogues()
+    actors_classified = await get_all_actor_classifiers()
+
+    if len(actor_dialogues) == len(actors_classified):
+        print("All actors are already classified.")
+        return
 
     actors_classification = {}  # Dictionary to store the classification of each actor
 
