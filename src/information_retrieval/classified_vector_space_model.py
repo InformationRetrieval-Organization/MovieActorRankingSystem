@@ -29,10 +29,8 @@ async def search_classified_vector_space_model(query: List[str]) -> List[int]:
 
     # Assuming we have a function to classify a text and get its vector representation
     query_classification_map = await classify_query(query)
-    print("This is the query class map", query_classification_map)
 
     query_vector = compute_query_vector(query_classification_map)
-    print(query_vector)
 
     # Calculate cosine similarity between the query vector and actor vectors
     actor_cosine_similarity_map = {}
@@ -41,10 +39,7 @@ async def search_classified_vector_space_model(query: List[str]) -> List[int]:
         magnitude_query = np.linalg.norm(query_vector)
         magnitude_entry = np.linalg.norm(vector)
         cosine_similarity = dot_product / (magnitude_query * magnitude_entry)
-
-        # print(cosine_similarity)
         actor_cosine_similarity_map[actor_id] = cosine_similarity
-
     # sort cosine similarity descending
     sorted_actor_cosine_similarity_map = {
         k: v
@@ -52,12 +47,10 @@ async def search_classified_vector_space_model(query: List[str]) -> List[int]:
             actor_cosine_similarity_map.items(), key=lambda item: item[1], reverse=True
         )
     }
-
     # return the top 10 actors
     top_10_actors = await get_actors_by_ids(
         list(sorted_actor_cosine_similarity_map.keys())[:10]
     )
-
     return top_10_actors
 
 
@@ -83,12 +76,12 @@ def calculate_actor_vector(actor: models.ActorClassifier) -> List[float]:
     Read the values for the classification and calculate the vector for the actor
     """
     vector = []
-    vector.append(actor.angerScore)
-    vector.append(actor.fearScore)
-    vector.append(actor.joyScore)
-    vector.append(actor.sadnessScore)
     vector.append(actor.loveScore)
+    vector.append(actor.joyScore)
+    vector.append(actor.angerScore)
+    vector.append(actor.sadnessScore)
     vector.append(actor.surpriseScore)
+    vector.append(actor.fearScore)
     return vector
 
 
@@ -120,12 +113,12 @@ async def classify_query(query: List[str]) -> List[Dict]:
     for classification in classifications:
         # Initialize a dictionary to store emotional label scores for each classification
         label_scores = {
-            "sadness": [],
+            "love": [],
             "joy": [],
             "anger": [],
-            "fear": [],
+            "sadness": [],
             "surprise": [],
-            "love": [],
+            "fear": [],
         }
         for label_score in classification:
             label = label_score["label"]
@@ -143,12 +136,12 @@ def compute_query_vector(query_clasifications: List[Dict]) -> List[float]:
 
     # Initialize a dictionary to store the sum of scores for each label
     label_sum = {
-        "sadness": 0,
+        "love": 0,
         "joy": 0,
         "anger": 0,
-        "fear": 0,
+        "sadness": 0,
         "surprise": 0,
-        "love": 0,
+        "fear": 0,
     }
 
     # Iterate through the data and compute the sum of scores for each label
