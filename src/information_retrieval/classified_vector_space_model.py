@@ -14,6 +14,7 @@ from nltk.corpus import wordnet as wn
 from db.actor_classifier import get_all_actor_classifiers
 from utils.classification import get_classification
 from config import FAME_COEFFICIENT_PERCENTAGE
+from db.actor_classifier import get_all_actor_classifiers
 
 fame_coefficient_map = {}
 
@@ -170,9 +171,12 @@ async def calculate_fame_coefficient_map() -> Dict[int, float]:
     """
     Calculate the fame coefficient for an actor based on their classification scores.
     """
-
     actors_list = await get_actors_by_most_roles()
-    actor_ids = [actor.id for actor in actors_list]  # only store actor ids
+    classified_actors = await get_all_actor_classifiers()
+    classified_actor_ids = [actor.actorId for actor in classified_actors]
+    actor_ids = [
+        actor.id for actor in actors_list if actor.id in classified_actor_ids
+    ]  # only store actor ids that have been classified
 
     # should be not that high, because sin similarity is max 1
     max_fame_coefficient = 3
