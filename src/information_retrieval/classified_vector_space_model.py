@@ -9,10 +9,11 @@ from tqdm import tqdm
 from concurrent.futures import ProcessPoolExecutor
 from prisma import models
 from db.actor_classifier import get_all_actor_classifiers
-import nltk
+from db.actor import get_actors_by_most_roles
 from nltk.corpus import wordnet as wn
 from db.actor_classifier import get_all_actor_classifiers
 from utils.classification import get_classification
+from config import MAX_FAME_COEFFICIENT, MIN_FAME_COEFFICIENT
 
 
 async def search_classified_vector_space_model(query: List[str]) -> List[int]:
@@ -60,26 +61,32 @@ async def build_classified_vector_space_model():
     print("Building classified vector space model")
     # Get all classified actors
     classified_actors = await get_all_actor_classifiers()
+    # Calculate the fame coefficient map
+    fame_coefficient_map = await calculate_fame_coefficient_map()
+
     # Caculate vectors for each actor
     for actor in tqdm(classified_actors):
         # Calculate the vector for the actor
-        vector = calculate_actor_vector(actor)
+        vector = calculate_actor_vector(actor, fame_coefficient_map[actor.actorId])
         globals._classified_actors_vector_map[actor.actorId] = vector
 
     print("Building classified vector space model completed")
 
 
-def calculate_actor_vector(actor: models.ActorClassifier) -> List[float]:
+def calculate_actor_vector(
+    actor: models.ActorClassifier, fame_coefficient: float
+) -> List[float]:
     """
     Read the values for the classification and calculate the vector for the actor
     """
     vector = []
-    vector.append(actor.loveScore)
-    vector.append(actor.joyScore)
-    vector.append(actor.angerScore)
-    vector.append(actor.sadnessScore)
-    vector.append(actor.surpriseScore)
-    vector.append(actor.fearScore)
+
+    vector.append(actor.loveScore) * fame_coefficient
+    vector.append(actor.joyScore) * fame_coefficient
+    vector.append(actor.angerScore) * fame_coefficient
+    vector.append(actor.sadnessScore) * fame_coefficient
+    vector.append(actor.surpriseScore) * fame_coefficient
+    vector.append(actor.fearScore) * fame_coefficient
     return vector
 
 
@@ -152,3 +159,22 @@ def compute_query_vector(query_clasifications: List[Dict]) -> List[float]:
     # Convert the label averages into a vector
     label_vector = [label_avg[label] for label in label_sum]
     return label_vector
+
+
+async def calculate_fame_coefficient_map() -> Dict[int, float]:
+    """
+    Calculate the fame coefficient for an actor based on their classification scores.
+    """
+
+    actors_list = await get_actors_by_most_roles()
+    actors_list = [actor.id for actor in actors_list]  # only store actor ids
+
+    # Calculate the coefficient for each actor
+    fame_coefficient_map = {}
+    for actor_id in actors_list:
+        fame_coefficient = MAX_FAME_COEFFICIENT - (
+            (MAX_FAME_COEFFICIENT - MIN_FAME_COEFFICIENT)
+            * actors_list.index(actor_id)
+            / len(actors_list)
+        )
+        fame_coefficient_map[actor_id] = fame_coefficient
