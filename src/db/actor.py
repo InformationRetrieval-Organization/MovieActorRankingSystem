@@ -155,3 +155,21 @@ async def get_all_actors_dialogues_processed() -> List[models.Actor]:
     except Exception as e:
         print(f"An error occurred while fetching actors: {e}")
         return []
+
+
+async def get_actors_by_most_roles() -> List[models.Actor]:
+    """
+    Fetch all actors from the database sorted by the number of roles they have.
+    """
+    try:
+        async with Prisma() as db:
+            # Fetch actors with their roles
+            actors_with_roles = await db.actor.find_many(include={"roles": True})
+            actors_with_roles = sorted(
+                actors_with_roles, key=lambda actor: len(actor.roles), reverse=True
+            )
+
+            return actors_with_roles
+    except Exception as e:
+        print(f"An error occurred while fetching actors: {e}")
+        return []
