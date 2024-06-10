@@ -21,15 +21,13 @@ async def search_classified_vector_space_model(query: List[str]) -> List[int]:
     """
     # Get synonyms for the query terms
     query_synonyms = []
-    for term in query:
-        query_synonyms.extend(get_some_word_synonyms(term))
+    query_synonyms.append(query)
+    # for term in query:
+    # query_synonyms.extend(get_some_word_synonyms(term))
+    # classify the query
+    query_classification_map = await classify_query(query_synonyms)
 
-    # Unique and lowercased synonyms
-    query_terms = list(set(query_synonyms))
-
-    # Assuming we have a function to classify a text and get its vector representation
-    query_classification_map = await classify_query(query)
-
+    # create the query vector
     query_vector = compute_query_vector(query_classification_map)
 
     # Calculate cosine similarity between the query vector and actor vectors
@@ -123,8 +121,6 @@ async def classify_query(query: List[str]) -> List[Dict]:
         for label_score in classification:
             label = label_score["label"]
             score = label_score["score"]
-            if label == "love":
-                print("Love:" + str(score))
             label_scores[label].append(score)
         # Append the label_scores dictionary to the query_classifications list
         query_classifications.append(label_scores)
