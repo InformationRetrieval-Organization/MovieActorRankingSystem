@@ -68,6 +68,7 @@ async def build_classified_vector_space_model():
     classified_actors = await get_all_actor_classifiers()
 
     # Calculate the fame coefficient map
+    global fame_coefficient_map
     fame_coefficient_map = await calculate_fame_coefficient_map()
 
     # Caculate vectors for each actor
