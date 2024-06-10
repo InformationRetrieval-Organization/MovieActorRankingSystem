@@ -4,7 +4,11 @@ import sys
 import asyncio
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-from db.actor import create_many_actors, delete_all_actors, search_actor, search_actors
+from db.actor import (
+    create_many_actors,
+    delete_all_actors,
+    get_actors_by_names,
+)
 from db.movie import create_many_movies, delete_all_movies, search_movie, search_movies
 from db.role import create_many_roles, delete_all_roles, search_roles
 from db.script import create_many_scripts, delete_all_scripts
@@ -96,8 +100,12 @@ async def insert_roles():
     movie_ids = await search_movies(list(roles["imdb_movie_title"].unique()))
     roles["db_movie_id"] = roles["imdb_movie_title"].map(movie_ids)
 
-    actor_ids = await search_actors(list(roles["imdb_actor_name"].unique()))
-    roles["db_actor_id"] = roles["imdb_actor_name"].map(actor_ids)
+    actors = await get_actors_by_names(list(roles["imdb_actor_name"].unique()))
+
+    # add database actorId with search_actor function
+    roles["db_actor_id"] = roles["imdb_actor_name"].map(
+        {actor.name: actor.id for actor in actors}
+    )
 
     # select only the columns we need
     roles = roles[["role", "db_movie_id", "db_actor_id"]]

@@ -77,7 +77,7 @@ async def delete_all_actors() -> None:
         print(f"An error occurred while deleting actors: {e}")
 
 
-async def search_actor(name: str) -> List[models.Actor]:
+async def get_actors_by_name(name: str) -> List[models.Actor]:
     """
     Search for an actor in the database by name
     """
@@ -90,14 +90,14 @@ async def search_actor(name: str) -> List[models.Actor]:
         return []
 
 
-async def search_actors(names: List[str]) -> Dict[str, int]:
+async def get_actors_by_names(names: List[str]) -> List[models.Actor]:
     """
-    Search for actors by names
+    Search for actors by a list of names
     """
     try:
         async with Prisma() as db:
             actors = await db.actor.find_many(where={"name": {"in": names}})
-            return {actor.name: actor.id for actor in actors}
+            return actors
     except Exception as e:
         print(f"An error occurred while searching for the actors: {e}")
         return {}
