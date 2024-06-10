@@ -18,7 +18,7 @@ VOCABULARY_FILE_PATH = os.path.join(FILES_PATH, "vocabulary.csv")
 TERM_DOC_FREQ_FILE_PATH = os.path.join(FILES_PATH, "term_freq_map.csv")
 
 MAX_FAME_COEFFICIENT = 5
-LOW_FAME_COEFFICIENT = 1
+MIN_FAME_COEFFICIENT = 1
 
 # ---------------------------- START DATA CRAWLING ----------------------------
 # URL´s
