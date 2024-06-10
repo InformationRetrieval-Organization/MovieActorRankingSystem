@@ -41,10 +41,8 @@ async def search_classified_vector_space_model(query: List[str]) -> List[int]:
         magnitude_entry = np.linalg.norm(vector)
         cosine_similarity = dot_product / (magnitude_query * magnitude_entry)
         actor_value = (
-            cosine_similarity
-            * (1 - FAME_COEFFICIENT_PERCENTAGE)
-            + fame_coefficient_map[actor_id]
-            * FAME_COEFFICIENT_PERCENTAGE
+            cosine_similarity * (1 - FAME_COEFFICIENT_PERCENTAGE)
+            + fame_coefficient_map[actor_id] * FAME_COEFFICIENT_PERCENTAGE
         )
         actor_cosine_similarity_map[actor_id] = actor_value
     # sort cosine similarity descending
@@ -173,18 +171,19 @@ async def calculate_fame_coefficient_map() -> Dict[int, float]:
     """
 
     actors_list = await get_actors_by_most_roles()
-    actors_list = [actor.id for actor in actors_list]  # only store actor ids
+    actor_ids = [actor.id for actor in actors_list]  # only store actor ids
 
-    MAX_FAME_COEFFICIENT = 3
-    MIN_FAME_COEFFICIENT = 1
+    # should be not that high, because sin similarity is max 1
+    max_fame_coefficient = 3
+    min_fame_coefficient = 1
 
     # Calculate the coefficient for each actor
     fame_coefficient_map = {}
-    for actor_id in tqdm(actors_list, desc="Calculating fame coefficient"):
+    for actor_id in tqdm(actor_ids, desc="Calculating fame coefficient"):
         fame_coefficient = -(
-            (MAX_FAME_COEFFICIENT - MIN_FAME_COEFFICIENT)
-            * actors_list.index(actor_id)
-            / len(actors_list)
+            (max_fame_coefficient - min_fame_coefficient)
+            * actor_ids.index(actor_id)
+            / len(actor_ids)
         )
         fame_coefficient_map[actor_id] = fame_coefficient
 
