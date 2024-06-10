@@ -111,11 +111,9 @@ def plot_evaluation_results(results: pd.DataFrame):
     """
     print(results)
 
-    fig, axes = plt.subplots(nrows=2, ncols=3, figsize=(15, 10))  # Increase figure size
-
-    axes = results.set_index("query").plot(
-        kind="bar", subplots=True, ax=axes, layout=(2, 3), legend=False
-    )
+    axes = results.set_index("query")[
+        ["vector_space_recall", "vector_space_precision", "vector_space_f1"]
+    ].plot(kind="bar", subplots=True, layout=(3, 1), legend=False)
 
     # Loop over the axes and remove the x-label
     for ax in axes.flatten():
