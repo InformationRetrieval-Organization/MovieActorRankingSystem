@@ -53,8 +53,11 @@ async def search_classified_vector_space_model(query: List[str]) -> List[int]:
             actor_cosine_similarity_map.items(), key=lambda item: item[1], reverse=True
         )
     }
-    # return the top 10 actors
-    actors = await get_actors_by_ids(list(sorted_actor_cosine_similarity_map.keys()))
+
+    # return the top 100 actors
+    actors = await get_actors_by_ids(
+        list(sorted_actor_cosine_similarity_map.keys())[:100]
+    )
     return actors
 
 
