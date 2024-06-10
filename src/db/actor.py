@@ -96,7 +96,14 @@ async def get_actors_by_names(names: List[str]) -> List[models.Actor]:
     """
     try:
         async with Prisma() as db:
-            actors = await db.actor.find_many(where={"name": {"in": names}})
+            actors = []
+            for name in names:
+                actor = await db.actor.find_first(
+                    where={"name": {"contains": name.lower(), "mode": "insensitive"}}
+                )
+                if actor is not None:
+                    actors.append(actor)
+
             return actors
     except Exception as e:
         print(f"An error occurred while searching for the actors: {e}")
