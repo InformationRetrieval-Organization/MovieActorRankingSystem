@@ -54,10 +54,8 @@ async def search_classified_vector_space_model(query: List[str]) -> List[int]:
         )
     }
     # return the top 10 actors
-    top_10_actors = await get_actors_by_ids(
-        list(sorted_actor_cosine_similarity_map.keys())[:10]
-    )
-    return top_10_actors
+    actors = await get_actors_by_ids(list(sorted_actor_cosine_similarity_map.keys()))
+    return actors
 
 
 async def build_classified_vector_space_model():
