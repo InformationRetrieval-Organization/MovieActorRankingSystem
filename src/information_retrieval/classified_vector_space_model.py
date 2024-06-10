@@ -178,3 +178,5 @@ async def calculate_fame_coefficient_map() -> Dict[int, float]:
             / len(actors_list)
         )
         fame_coefficient_map[actor_id] = fame_coefficient
+
+    return fame_coefficient_map
