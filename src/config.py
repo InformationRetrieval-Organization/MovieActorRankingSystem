@@ -17,6 +17,10 @@ DATA_PATH = os.path.join(CWD, "data")
 VOCABULARY_FILE_PATH = os.path.join(FILES_PATH, "vocabulary.csv")
 TERM_DOC_FREQ_FILE_PATH = os.path.join(FILES_PATH, "term_freq_map.csv")
 
+GROUND_DATASET_FILE_PATH = os.path.join(FILES_PATH, "top_20_actors.csv")
+EVAL_MEASURES_IMAGE_PATH = os.path.join(FILES_PATH, "evaluation_measures.png")
+EVAL_MEASURES_CSV_PATH = os.path.join(FILES_PATH, "evaluation_measures.csv")
+
 FAME_COEFFICIENT_PERCENTAGE = 0.25
 
 # ---------------------------- START DATA CRAWLING ----------------------------
