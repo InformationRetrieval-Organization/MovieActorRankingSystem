@@ -1,7 +1,7 @@
-interface ActorResult {
+interface ActorModel {
     id: number;
     imdbId: number;
     name: string;
     headshotUrl: string;
-    //roles: Role[];
+    roles: RoleModel[];
 }

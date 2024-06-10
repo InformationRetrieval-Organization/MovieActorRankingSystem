@@ -7,14 +7,14 @@ import { getActors } from '../api/movieActorRanking';
 
 const SearchComponent = () => {
     const [inputValue, setInputValue] = useState("");
-    const [results, setResults] = useState<ActorResult[]>([]);
+    const [results, setResults] = useState<ActorModel[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
     const fetchData = async () => {
         setIsLoading(true);
 
         try {
-            let actors: ActorResult[] = [];
+            let actors: ActorModel[] = [];
 
             actors = await getActors(inputValue);
 

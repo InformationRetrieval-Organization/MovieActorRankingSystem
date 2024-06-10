@@ -10,7 +10,7 @@ const formatImdbActorUrl = (imdbId: number): string => {
     return `https://www.imdb.com/name/${formatImdbId(imdbId)}`;
 }
 
-export default function ResultsList({ results }: { results: ActorResult[] }) {
+export default function ResultsList({ results }: { results: ActorModel[] }) {
     const [currentPage, setCurrentPage] = useState(1);
     const [searchPerformed, setSearchPerformed] = useState(false);
     const [initialRender, setInitialRender] = useState(true);
