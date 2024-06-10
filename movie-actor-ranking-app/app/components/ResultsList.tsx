@@ -55,8 +55,12 @@ export default function ResultsList({ results }: { results: ActorModel[] }) {
                             <div className="flex flex-col grow">
                                 <div className="flex flex-col col-span-6">
                                     <Link className="mb-3 text-4xl" href={formatImdbActorUrl(result.imdbId)} target="_blank">{result.name}</Link>
-                                    <p className="text-sm">Films: ...</p>
-                                    <p className="text-sm">Roles: ...</p>
+                                    {result.roles.slice(0, 3).map((role, i) => (
+                                        <div key={i} className="flex flex-col gap-2">
+                                            <p className="text-sm"><em>{role.name}</em> in <strong>{role.movie.title}</strong></p>
+                                        </div>
+                                    ))}
+                                    {result.roles.length > 3 && <p className="text-sm">...</p>}
                                 </div>
                             </div>
                         </div>
