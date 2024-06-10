@@ -13,7 +13,9 @@ from db.actor import get_actors_by_most_roles
 from nltk.corpus import wordnet as wn
 from db.actor_classifier import get_all_actor_classifiers
 from utils.classification import get_classification
-from config import MAX_FAME_COEFFICIENT, MIN_FAME_COEFFICIENT
+from config import FAME_COEFFICIENT_PERCENTAGE
+
+fame_coefficient_map = {}
 
 
 async def search_classified_vector_space_model(query: List[str]) -> List[int]:
@@ -38,7 +40,13 @@ async def search_classified_vector_space_model(query: List[str]) -> List[int]:
         magnitude_query = np.linalg.norm(query_vector)
         magnitude_entry = np.linalg.norm(vector)
         cosine_similarity = dot_product / (magnitude_query * magnitude_entry)
-        actor_cosine_similarity_map[actor_id] = cosine_similarity
+        actor_value = (
+            cosine_similarity
+            * (1 - FAME_COEFFICIENT_PERCENTAGE)
+            + fame_coefficient_map[actor_id]
+            * FAME_COEFFICIENT_PERCENTAGE
+        )
+        actor_cosine_similarity_map[actor_id] = actor_value
     # sort cosine similarity descending
     sorted_actor_cosine_similarity_map = {
         k: v
@@ -60,6 +68,7 @@ async def build_classified_vector_space_model():
 
     # Get all classified actors
     classified_actors = await get_all_actor_classifiers()
+
     # Calculate the fame coefficient map
     fame_coefficient_map = await calculate_fame_coefficient_map()
 
@@ -78,12 +87,12 @@ def calculate_actor_vector(
     """
     vector = []
 
-    vector.append(actor.loveScore * fame_coefficient)
-    vector.append(actor.joyScore * fame_coefficient)
-    vector.append(actor.angerScore * fame_coefficient)
-    vector.append(actor.sadnessScore * fame_coefficient)
-    vector.append(actor.surpriseScore * fame_coefficient)
-    vector.append(actor.fearScore * fame_coefficient)
+    vector.append(actor.loveScore)
+    vector.append(actor.joyScore)
+    vector.append(actor.angerScore)
+    vector.append(actor.sadnessScore)
+    vector.append(actor.surpriseScore)
+    vector.append(actor.fearScore)
     return vector
 
 
@@ -166,10 +175,13 @@ async def calculate_fame_coefficient_map() -> Dict[int, float]:
     actors_list = await get_actors_by_most_roles()
     actors_list = [actor.id for actor in actors_list]  # only store actor ids
 
+    MAX_FAME_COEFFICIENT = 3
+    MIN_FAME_COEFFICIENT = 1
+
     # Calculate the coefficient for each actor
     fame_coefficient_map = {}
     for actor_id in tqdm(actors_list, desc="Calculating fame coefficient"):
-        fame_coefficient = MAX_FAME_COEFFICIENT - (
+        fame_coefficient = -(
             (MAX_FAME_COEFFICIENT - MIN_FAME_COEFFICIENT)
             * actors_list.index(actor_id)
             / len(actors_list)
