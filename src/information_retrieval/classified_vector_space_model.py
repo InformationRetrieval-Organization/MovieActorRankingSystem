@@ -58,19 +58,16 @@ async def build_classified_vector_space_model():
     Calculate the vectors for every actor based on their classification
     """
 
-    print("Building classified vector space model")
     # Get all classified actors
     classified_actors = await get_all_actor_classifiers()
     # Calculate the fame coefficient map
     fame_coefficient_map = await calculate_fame_coefficient_map()
 
     # Caculate vectors for each actor
-    for actor in tqdm(classified_actors):
+    for actor in tqdm(classified_actors, desc="Calculating actor vectors"):
         # Calculate the vector for the actor
         vector = calculate_actor_vector(actor, fame_coefficient_map[actor.actorId])
         globals._classified_actors_vector_map[actor.actorId] = vector
-
-    print("Building classified vector space model completed")
 
 
 def calculate_actor_vector(
@@ -81,12 +78,12 @@ def calculate_actor_vector(
     """
     vector = []
 
-    vector.append(actor.loveScore) * fame_coefficient
-    vector.append(actor.joyScore) * fame_coefficient
-    vector.append(actor.angerScore) * fame_coefficient
-    vector.append(actor.sadnessScore) * fame_coefficient
-    vector.append(actor.surpriseScore) * fame_coefficient
-    vector.append(actor.fearScore) * fame_coefficient
+    vector.append(actor.loveScore * fame_coefficient)
+    vector.append(actor.joyScore * fame_coefficient)
+    vector.append(actor.angerScore * fame_coefficient)
+    vector.append(actor.sadnessScore * fame_coefficient)
+    vector.append(actor.surpriseScore * fame_coefficient)
+    vector.append(actor.fearScore * fame_coefficient)
     return vector
 
 
@@ -171,7 +168,7 @@ async def calculate_fame_coefficient_map() -> Dict[int, float]:
 
     # Calculate the coefficient for each actor
     fame_coefficient_map = {}
-    for actor_id in actors_list:
+    for actor_id in tqdm(actors_list, desc="Calculating fame coefficient"):
         fame_coefficient = MAX_FAME_COEFFICIENT - (
             (MAX_FAME_COEFFICIENT - MIN_FAME_COEFFICIENT)
             * actors_list.index(actor_id)
