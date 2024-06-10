@@ -19,7 +19,7 @@ def load_classification_model() -> pipeline:
     return globals._classifier
 
 
-def get_classification(text: List[str]):
+def get_classification(text: List[str]) -> List[dict]:
     """
     Perform text classification using the loaded model
     """
