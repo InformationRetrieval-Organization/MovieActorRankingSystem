@@ -177,14 +177,12 @@ async def calculate_fame_coefficient_map() -> Dict[int, float]:
     max_fame_coefficient = 3
     min_fame_coefficient = 1
 
+    step_value = (max_fame_coefficient - min_fame_coefficient) / len(actor_ids)
+
     # Calculate the coefficient for each actor
     fame_coefficient_map = {}
     for actor_id in tqdm(actor_ids, desc="Calculating fame coefficient"):
-        fame_coefficient = -(
-            (max_fame_coefficient - min_fame_coefficient)
-            * actor_ids.index(actor_id)
-            / len(actor_ids)
-        )
+        fame_coefficient = max_fame_coefficient - step_value * actor_ids.index(actor_id)
         fame_coefficient_map[actor_id] = fame_coefficient
 
     return fame_coefficient_map
