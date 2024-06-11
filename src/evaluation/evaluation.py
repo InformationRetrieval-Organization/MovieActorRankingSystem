@@ -9,6 +9,7 @@ from datetime import datetime, timedelta, timezone
 import os
 import sys
 from prisma import models
+import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
@@ -109,21 +110,26 @@ def plot_evaluation_results(results: pd.DataFrame):
     Args:
         results (pd.DataFrame): Evaluation results DataFrame
     """
-    print(results)
-
     axes = results.set_index("query")[
         ["vector_space_recall", "vector_space_precision", "vector_space_f1"]
     ].plot(kind="bar", subplots=True, layout=(3, 1), legend=False)
 
+    # Ensure axes is a 1D array
+    axes = np.ravel(axes)
+
     # Loop over the axes and remove the x-label
-    for ax in axes.flatten():
+    for i, ax in enumerate(axes):
         ax.set_ylim([0, 1])
         ax.set_ylabel("Score")
 
-        ax.set_xticks(range(len(results)))
-        ax.set_xticklabels(
-            ax.get_xticklabels(), rotation=45, horizontalalignment="right"
-        )  # Adjust alignment
+        # Set x-axis labels only for the last subplot
+        if i == len(axes) - 1:
+            ax.set_xticklabels(
+                results["query"], rotation=45, horizontalalignment="right"
+            )  # Adjust alignment
+            ax.set_xlabel("")  # Remove x-axis label
+        else:
+            ax.set_xticklabels([])  # Remove x-axis labels for other subplots
 
     plt.tight_layout()
     plt.savefig(EVAL_MEASURES_IMAGE_PATH)
