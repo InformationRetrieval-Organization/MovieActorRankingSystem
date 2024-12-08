@@ -1,5 +1,4 @@
-# Movie Actor Ranking UI
-[![Build and deploy container app to Azure Web App - app-movieactorranking-prod](https://github.com/InformationRetrieval-Organization/MovieActorRankingUI/actions/workflows/main_app-movieactorranking-prod.yml/badge.svg)](https://github.com/InformationRetrieval-Organization/MovieActorRankingUI/actions/workflows/main_app-movieactorranking-prod.yml)
+# movie actor ranking - app
 
 ## Technologies Used
 
