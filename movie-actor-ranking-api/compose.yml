@@ -1,0 +1,13 @@
+# The containers that compose the project
+services:
+  db:
+    image: postgres
+    restart: always
+    container_name: movieactorrankingpostgres
+    ports:
+      - '5433:5432'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: movieactorrankingdb
+
