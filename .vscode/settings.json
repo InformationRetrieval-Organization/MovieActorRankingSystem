@@ -14,5 +14,19 @@
     },
     "terminal.integrated.env.windows": {
         "PYTHONPATH": "${workspaceFolder}/.venv/bin/python"
+    },
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "appService.zipIgnorePattern": [
+      "node_modules{,/**}",
+      ".vscode{,/**}"
+    ],
+    "appService.deploySubpath": ".",
+    "[json]": {
+      "editor.tabSize": 4,
+      "editor.formatOnSave": true
+    },
+    "[typescriptreact]": {
+      "editor.tabSize": 4,
+      "editor.formatOnSave": true
     }
 }
