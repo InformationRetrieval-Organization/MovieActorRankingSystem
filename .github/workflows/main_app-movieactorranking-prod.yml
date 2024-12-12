@@ -7,6 +7,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'movie-actor-ranking-app/**'
   workflow_dispatch:
 
 jobs:
@@ -15,6 +17,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        path: movie-actor-ranking-app
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
@@ -29,6 +33,7 @@ jobs:
     - name: Build and push container image to registry
       uses: docker/build-push-action@v3
       with:
+        context: '{{defaultContext}}:movie-actor-ranking-app'
         push: true
         tags: tonylukeregistry.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_09a821d2ddd94f2f8b7d0c1a8c8926c4 }}/movie-actor-ranking/app:${{ github.sha }}
         file: ./Dockerfile
